@@ -1,4 +1,17 @@
 {
   "framework": "tanstack-start",
-  "buildCommand": "npm run build"
+  "buildCommand": "npm run build",
+  "rewrites": [
+    { "source": "/api/auth/login", "destination": "/api/auth?action=login" },
+    { "source": "/api/auth/register", "destination": "/api/auth?action=register" },
+    { "source": "/api/auth/logout", "destination": "/api/auth?action=logout" },
+    { "source": "/api/auth/me", "destination": "/api/auth?action=me" },
+    { "source": "/api/auth/change-password", "destination": "/api/auth?action=change-password" },
+    { "source": "/api/products/:slug", "destination": "/api/products?slug=:slug" },
+    { "source": "/api/orders/:id/cancel", "destination": "/api/orders?id=:id&action=cancel" },
+    { "source": "/api/orders/:id", "destination": "/api/orders?id=:id" },
+    { "source": "/api/admin/customers/:id", "destination": "/api/admin/customers?id=:id" },
+    { "source": "/api/admin/orders/:id", "destination": "/api/admin/orders?id=:id" },
+    { "source": "/api/admin/products/:id", "destination": "/api/admin/products?id=:id" }
+  ]
 }
