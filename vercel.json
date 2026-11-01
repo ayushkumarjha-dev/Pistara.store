@@ -13,6 +13,6 @@
     }
   ],
   "functions": {
-    "api/**/*.ts": { "runtime": "@vercel/node@3.x" }
+    "api/**/*.ts": { "runtime": "nodejs20.x" }
   }
 }
