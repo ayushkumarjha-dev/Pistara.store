@@ -83,13 +83,27 @@ jobs:
         run: npm ci
 
       # Requires repository secrets: VERCEL_TOKEN, VERCEL_ORG_ID,
-      # VERCEL_PROJECT_ID. vercel.json sets git.deploymentEnabled=false so
-      # this workflow is the only thing that deploys production.
+      # VERCEL_PROJECT_ID (see the guard step for where to add them).
+      # vercel.json sets git.deploymentEnabled=false so this workflow is the
+      # only thing that deploys production.
+      - name: Guard Vercel secrets
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          for v in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Missing repository secret '$v'. Add it under Settings → Secrets and variables → Actions (New repository secret)."
+              exit 1
+            fi
+          done
+
       - name: Deploy to Vercel
         run: |
-          npx vercel pull --yes --environment=production
+          npx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           npx vercel build
-          npx vercel deploy --prebuilt --prod
+          npx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
