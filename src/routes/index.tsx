@@ -3,8 +3,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Leaf, PackageCheck, Quote, QrCode,
-  ShieldCheck, ShoppingBasket, Sparkles, Star, Truck,
+  ArrowRight,
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
+  Leaf,
+  PackageCheck,
+  Quote,
+  QrCode,
+  ShieldCheck,
+  ShoppingBasket,
+  Sparkles,
+  Star,
+  Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getCategories, getProducts, getTestimonials } from "@/lib/api";
@@ -18,8 +29,14 @@ import makhana from "@/assets/makhana.jpg";
 import raisins from "@/assets/raisins.jpg";
 import sourcing from "@/assets/sourcing.jpg";
 
-const featuredQ = queryOptions({ queryKey: ["products", "featured"], queryFn: () => getProducts({ featured: true }) });
-const allQ = queryOptions({ queryKey: ["products", "all"], queryFn: () => getProducts({ limit: 50 }) });
+const featuredQ = queryOptions({
+  queryKey: ["products", "featured"],
+  queryFn: () => getProducts({ featured: true }),
+});
+const allQ = queryOptions({
+  queryKey: ["products", "all"],
+  queryFn: () => getProducts({ limit: 50 }),
+});
 const catsQ = queryOptions({ queryKey: ["categories"], queryFn: getCategories });
 const testQ = queryOptions({ queryKey: ["testimonials"], queryFn: getTestimonials });
 
@@ -27,9 +44,16 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Pistara | Premium Dry Fruits, Pure & Natural" },
-      { name: "description", content: "Hand-selected makhana, W320 cashews and raisins. Hygienically packed, delivered fast across India." },
+      {
+        name: "description",
+        content:
+          "Hand-selected makhana, W320 cashews and raisins. Hygienically packed, delivered fast across India.",
+      },
       { property: "og:title", content: "Pistara | Premium Dry Fruits, Pure & Natural" },
-      { property: "og:description", content: "Hand-selected makhana, cashews and raisins, delivered fresh across India." },
+      {
+        property: "og:description",
+        content: "Hand-selected makhana, cashews and raisins, delivered fresh across India.",
+      },
     ],
   }),
   loader: ({ context }) =>
@@ -63,28 +87,45 @@ function Hero() {
   return (
     <section className="grain relative overflow-hidden">
       <div className="container-page grid items-center gap-14 pb-20 pt-10 lg:grid-cols-[1.05fr_1fr] lg:pb-28 lg:pt-16">
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
-          <p className="eyebrow flex items-center gap-2"><Leaf className="size-3.5" /> {t("heroEyebrow")}</p>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="eyebrow flex items-center gap-2">
+            <Leaf className="size-3.5" /> {t("heroEyebrow")}
+          </p>
           <h1 className="mt-5 text-[2.6rem] font-extrabold leading-[1.02] text-primary-deep sm:text-6xl lg:text-[4.5rem]">
             {t("heroA")}
             <br />
             <span className="accent-serif font-semibold text-primary">{t("heroB")}</span>
           </h1>
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">{t("heroSub")}</p>
+          <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
+            {t("heroSub")}
+          </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Button size="lg" asChild>
-              <Link to="/shop">{t("shopNow")} <ArrowRight /></Link>
+              <Link to="/shop">
+                {t("shopNow")} <ArrowRight />
+              </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
               <Link to="/about">{t("ourStory")}</Link>
             </Button>
           </div>
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1.5"><Star className="size-4 fill-gold text-gold" /> <b className="text-foreground">4.9</b> rating</span>
+            <span className="flex items-center gap-1.5">
+              <Star className="size-4 fill-gold text-gold" /> <b className="text-foreground">4.9</b>{" "}
+              rating
+            </span>
             <span className="h-4 w-px bg-border" />
-            <span className="flex items-center gap-1.5"><Leaf className="size-4 text-primary" /> {t("natural")}</span>
+            <span className="flex items-center gap-1.5">
+              <Leaf className="size-4 text-primary" /> {t("natural")}
+            </span>
             <span className="h-4 w-px bg-border" />
-            <span className="flex items-center gap-1.5"><Truck className="size-4 text-primary" /> {t("fast")}</span>
+            <span className="flex items-center gap-1.5">
+              <Truck className="size-4 text-primary" /> {t("fast")}
+            </span>
           </div>
         </motion.div>
 
@@ -94,19 +135,40 @@ function Hero() {
           transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto w-full max-w-[540px]"
         >
-          <svg viewBox="0 0 600 600" className="absolute -inset-10 -z-10 size-[calc(100%+5rem)] text-sage" aria-hidden>
-            <path fill="currentColor" d="M455 92c58 46 103 121 98 196-5 76-60 152-128 205-68 52-149 82-226 63-77-20-150-90-170-172-20-83 13-178 74-238C164 86 254 61 323 57c68-4 74-11 132 35Z" />
+          <svg
+            viewBox="0 0 600 600"
+            className="absolute -inset-10 -z-10 size-[calc(100%+5rem)] text-sage"
+            aria-hidden
+          >
+            <path
+              fill="currentColor"
+              d="M455 92c58 46 103 121 98 196-5 76-60 152-128 205-68 52-149 82-226 63-77-20-150-90-170-172-20-83 13-178 74-238C164 86 254 61 323 57c68-4 74-11 132 35Z"
+            />
           </svg>
           <div className="overflow-hidden rounded-[2.5rem] shadow-lift">
-            <img src={hero} alt="Cashews, raisins, makhana and almonds in a ceramic bowl" width={1200} height={1408} className="aspect-[4/5] w-full object-cover" />
+            <img
+              src={hero}
+              alt="Cashews, raisins, makhana and almonds in a ceramic bowl"
+              width={1200}
+              height={1408}
+              className="aspect-[4/5] w-full object-cover"
+            />
           </div>
           {[
             { img: cashew, cls: "-left-6 top-14 md:-left-12", d: 0 },
             { img: makhana, cls: "-right-4 top-1/3 md:-right-10", d: 1.5 },
             { img: raisins, cls: "-left-2 bottom-20 md:-left-8", d: 3 },
           ].map((f) => (
-            <div key={f.img} className={`animate-float absolute ${f.cls}`} style={{ animationDelay: `${f.d}s` }}>
-              <img src={f.img} alt="" className="size-20 rounded-full border-4 border-card object-cover shadow-lift md:size-24" />
+            <div
+              key={f.img}
+              className={`animate-float absolute ${f.cls}`}
+              style={{ animationDelay: `${f.d}s` }}
+            >
+              <img
+                src={f.img}
+                alt=""
+                className="size-20 rounded-full border-4 border-card object-cover shadow-lift md:size-24"
+              />
             </div>
           ))}
           <div className="absolute -bottom-5 right-8 flex items-center gap-2 rounded-full bg-gold px-5 py-3 font-display text-sm font-bold text-gold-foreground shadow-gold">
@@ -130,8 +192,14 @@ function TrustStrip() {
     <section className="border-y bg-card">
       <div className="container-page grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((it, i) => (
-          <Reveal key={it.label} delay={i * 0.08} className="flex items-center gap-4 border-border px-2 py-5 sm:py-7 lg:justify-center lg:border-l lg:first:border-l-0">
-            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-sage text-primary"><it.icon className="size-5" /></span>
+          <Reveal
+            key={it.label}
+            delay={i * 0.08}
+            className="flex items-center gap-4 border-border px-2 py-5 sm:py-7 lg:justify-center lg:border-l lg:first:border-l-0"
+          >
+            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-sage text-primary">
+              <it.icon className="size-5" />
+            </span>
             <div>
               <p className="font-display text-sm font-semibold text-primary-deep">{it.label}</p>
               <p className="text-xs text-muted-foreground">{it.sub}</p>
@@ -155,8 +223,17 @@ function Categories() {
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {cats.map((c, i) => (
             <Reveal key={c.slug} delay={i * 0.1}>
-              <Link to="/shop" search={{ category: c.slug }} className="group relative block aspect-[4/5] overflow-hidden rounded-3xl shadow-soft">
-                <img src={c.imageUrl ?? ""} alt={c.name} loading="lazy" className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <Link
+                to="/shop"
+                search={{ category: c.slug }}
+                className="group relative block aspect-[4/5] overflow-hidden rounded-3xl shadow-soft"
+              >
+                <img
+                  src={c.imageUrl ?? ""}
+                  alt={c.name}
+                  loading="lazy"
+                  className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
                 <div className="bg-overlay absolute inset-0" />
                 <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-7 text-primary-foreground">
                   <div>
@@ -189,7 +266,9 @@ function Featured() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionTitle eyebrow="Bestsellers" a={t("featured")} b={t("picks")} align="left" />
           <Button variant="outline" asChild>
-            <Link to="/shop">{t("viewAll")} <ArrowRight /></Link>
+            <Link to="/shop">
+              {t("viewAll")} <ArrowRight />
+            </Link>
           </Button>
         </div>
         <motion.div
@@ -200,7 +279,13 @@ function Featured() {
           variants={{ show: { transition: { staggerChildren: 0.08 } } }}
         >
           {featured.map((p) => (
-            <motion.div key={p.id} variants={{ hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}>
+            <motion.div
+              key={p.id}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+              }}
+            >
               <ProductCard product={p} />
             </motion.div>
           ))}
@@ -213,16 +298,33 @@ function Featured() {
 function WhyPistara() {
   const { t } = useI18n();
   const points = [
-    { title: "Direct from the farm", text: "We buy straight from growers in Mithila, Konkan and Nashik, with no middlemen and no old stock." },
-    { title: "Graded by hand", text: "Every batch is sorted by size and colour. Broken pieces never make it into a Pistara pack." },
-    { title: "Packed fresh, sealed tight", text: "Nitrogen-flushed, resealable pouches lock in crunch and natural oils for months." },
-    { title: "Honest, transparent pricing", text: "Clear per-pack prices with a flat ₹50 delivery. What you see is what you pay." },
+    {
+      title: "Direct from the farm",
+      text: "We buy straight from growers in Mithila, Konkan and Nashik, with no middlemen and no old stock.",
+    },
+    {
+      title: "Graded by hand",
+      text: "Every batch is sorted by size and colour. Broken pieces never make it into a Pistara pack.",
+    },
+    {
+      title: "Packed fresh, sealed tight",
+      text: "Nitrogen-flushed, resealable pouches lock in crunch and natural oils for months.",
+    },
+    {
+      title: "Honest, transparent pricing",
+      text: "Clear per-pack prices with a flat ₹50 delivery. What you see is what you pay.",
+    },
   ];
   return (
     <section className="section-y bg-sage">
       <div className="container-page grid items-center gap-14 lg:grid-cols-2">
         <Reveal className="relative">
-          <img src={sourcing} alt="Artisans hand-sorting cashews and raisins" loading="lazy" className="aspect-[5/6] w-full rounded-[2rem] object-cover shadow-lift" />
+          <img
+            src={sourcing}
+            alt="Artisans hand-sorting cashews and raisins"
+            loading="lazy"
+            className="aspect-[5/6] w-full rounded-[2rem] object-cover shadow-lift"
+          />
           <div className="absolute -bottom-6 -right-2 rounded-2xl border bg-card p-5 shadow-lift md:-right-8">
             <p className="font-display text-3xl font-extrabold text-primary">12+</p>
             <p className="text-xs text-muted-foreground">partner farms across India</p>
@@ -258,11 +360,15 @@ function PackBanner() {
         </h2>
         <div className="flex flex-wrap justify-center gap-3">
           {["250g · Try it", "500g · Family", "1kg · Best value"].map((s) => (
-            <span key={s} className="rounded-full border border-gold/50 px-5 py-2 text-sm">{s}</span>
+            <span key={s} className="rounded-full border border-gold/50 px-5 py-2 text-sm">
+              {s}
+            </span>
           ))}
         </div>
         <Button variant="gold" size="lg" asChild>
-          <Link to="/shop">{t("packCta")} <ArrowRight /></Link>
+          <Link to="/shop">
+            {t("packCta")} <ArrowRight />
+          </Link>
         </Button>
       </Reveal>
     </section>
@@ -292,7 +398,9 @@ function Testimonials() {
                 className={`flex flex-col rounded-3xl border bg-card p-8 shadow-soft ${k > 0 ? "hidden md:flex" : ""}`}
               >
                 <Quote className="size-9 fill-gold/20 text-gold" />
-                <blockquote className="mt-5 flex-1 leading-relaxed text-foreground/85">“{r.quote}”</blockquote>
+                <blockquote className="mt-5 flex-1 leading-relaxed text-foreground/85">
+                  “{r.quote}”
+                </blockquote>
                 <div className="mt-6 h-px bg-gold/30" />
                 <figcaption className="mt-5 flex items-center justify-between">
                   <div>
@@ -306,8 +414,17 @@ function Testimonials() {
           </AnimatePresence>
         </div>
         <div className="mt-10 flex justify-center gap-3">
-          <Button variant="outline" size="icon" onClick={() => go(-1)} aria-label="Previous testimonial"><ChevronLeft /></Button>
-          <Button variant="outline" size="icon" onClick={() => go(1)} aria-label="Next testimonial"><ChevronRight /></Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => go(-1)}
+            aria-label="Previous testimonial"
+          >
+            <ChevronLeft />
+          </Button>
+          <Button variant="outline" size="icon" onClick={() => go(1)} aria-label="Next testimonial">
+            <ChevronRight />
+          </Button>
         </div>
       </div>
     </section>
@@ -326,12 +443,17 @@ function Steps() {
       <div className="container-page">
         <SectionTitle eyebrow="How it works" a={t("stepsTitle")} b={t("stepsB")} />
         <div className="relative mt-16 grid gap-10 md:grid-cols-3">
-          <div className="absolute left-[16%] right-[16%] top-10 hidden h-px border-t-2 border-dashed border-gold/50 md:block" aria-hidden />
+          <div
+            className="absolute left-[16%] right-[16%] top-10 hidden h-px border-t-2 border-dashed border-gold/50 md:block"
+            aria-hidden
+          />
           {steps.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.12} className="relative text-center">
               <div className="relative mx-auto grid size-20 place-items-center rounded-full border bg-card text-primary shadow-soft">
                 <s.icon className="size-8" />
-                <span className="absolute -right-1 -top-1 grid size-7 place-items-center rounded-full bg-gold font-display text-xs font-bold text-gold-foreground">{i + 1}</span>
+                <span className="absolute -right-1 -top-1 grid size-7 place-items-center rounded-full bg-gold font-display text-xs font-bold text-gold-foreground">
+                  {i + 1}
+                </span>
               </div>
               <h3 className="mt-6 text-lg font-bold text-primary-deep">{s.label}</h3>
               <p className="mx-auto mt-2 max-w-xs text-sm text-muted-foreground">{s.text}</p>
@@ -340,7 +462,9 @@ function Steps() {
         </div>
         <div className="mt-14 flex justify-center">
           <Button size="lg" asChild>
-            <Link to="/shop"><PackageCheck /> {t("shopNow")}</Link>
+            <Link to="/shop">
+              <PackageCheck /> {t("shopNow")}
+            </Link>
           </Button>
         </div>
       </div>
@@ -361,19 +485,24 @@ function Newsletter() {
             {t("newsletter")} <span className="accent-serif text-gold">{t("newsletterB")}</span>
           </h2>
           <LeafDivider className="mt-5" light />
-          <p className="mx-auto mt-5 max-w-md text-sm text-primary-foreground/70">Seasonal harvest drops, recipes and members-only offers. No spam, ever.</p>
+          <p className="mx-auto mt-5 max-w-md text-sm text-primary-foreground/70">
+            Seasonal harvest drops, recipes and members-only offers. No spam, ever.
+          </p>
           <form
             noValidate
             className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row"
             onSubmit={(e) => {
               e.preventDefault();
-              if (!/^\S+@\S+\.\S+$/.test(email)) return setErr("Please enter a valid email address.");
+              if (!/^\S+@\S+\.\S+$/.test(email))
+                return setErr("Please enter a valid email address.");
               setErr("");
               setEmail("");
               toast.success("You're in!", { description: "Welcome to the Pistara circle." });
             }}
           >
-            <label htmlFor="nl-email" className="sr-only">Email</label>
+            <label htmlFor="nl-email" className="sr-only">
+              Email
+            </label>
             <input
               id="nl-email"
               type="email"
@@ -383,7 +512,9 @@ function Newsletter() {
               aria-invalid={!!err}
               className="h-12 flex-1 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-5 text-sm text-primary-foreground outline-none placeholder:text-primary-foreground/50 focus:border-gold"
             />
-            <Button variant="gold" size="lg" type="submit">{t("subscribe")}</Button>
+            <Button variant="gold" size="lg" type="submit">
+              {t("subscribe")}
+            </Button>
           </form>
           {err && <p className="mt-3 text-sm text-gold">{err}</p>}
         </Reveal>

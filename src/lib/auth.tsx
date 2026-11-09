@@ -46,7 +46,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const logoutMut = useMutation({
     mutationFn: () => apiPost("/api/auth/logout"),
-    onSuccess: () => qc.clear(),
+    onSuccess: () => {
+      qc.clear();
+      // Re-seed `me` as signed out instead of waiting for a refetch: a
+      // refetch finishing after logout() resolves would flip `loading` true
+      // and back false, re-running guarded-route effects exactly when the
+      // caller's post-logout navigation is still committing — the redirect
+      // would win again.
+      qc.setQueryData<MeResponse>(["me"], { user: null });
+    },
   });
 
   const value: AuthCtx = {
@@ -56,8 +64,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading: isLoading,
     isAdmin: data?.user?.role === "admin",
     login: async (email, password) => (await loginMut.mutateAsync({ email, password })).user,
-    register: async (name, email, password) => (await registerMut.mutateAsync({ name, email, password })).user,
+    register: async (name, email, password) =>
+      (await registerMut.mutateAsync({ name, email, password })).user,
     logout: async () => {
+      // Clears the session, then the caller navigates wherever it wants.
+      // Guarded routes see the user disappear and stay put — they detect
+      // "signed out here" via their mounted-time user snapshot (see
+      // hadUser in the guarded route components).
       await logoutMut.mutateAsync();
     },
     refresh: invalidate,

@@ -2,7 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { LeafDivider } from "./brand";
 
-export function ComingNext({ title, accent, text }: { title: string; accent: string; text: string }) {
+export function ComingNext({
+  title,
+  accent,
+  text,
+}: {
+  title: string;
+  accent: string;
+  text: string;
+}) {
   return (
     <section className="grain section-y">
       <div className="container-page max-w-2xl text-center">

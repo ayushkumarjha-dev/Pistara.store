@@ -2,7 +2,13 @@ import { describe, expect, it, beforeAll } from "vitest";
 import { config } from "dotenv";
 config({ path: ".env.test", override: true });
 
-import { SESSION_COOKIE, clearSessionCookie, sessionCookie, signSession, verifySession } from "../../server-lib/auth";
+import {
+  SESSION_COOKIE,
+  clearSessionCookie,
+  sessionCookie,
+  signSession,
+  verifySession,
+} from "../../server-lib/auth";
 import { formatOrderNumber } from "../../server-lib/order-number";
 
 beforeAll(() => {

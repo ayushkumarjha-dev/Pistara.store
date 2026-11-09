@@ -1,7 +1,13 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useChildMatches,
+  useNavigate,
+} from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { PackageOpen } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { apiGet, type ApiOrder } from "@/lib/api-client";
 import { formatINR } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -25,18 +31,29 @@ function OrdersPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { t } = useI18n();
+  // /orders/$id is a child route of /orders — when it is active we render only
+  // the detail via the Outlet; otherwise the list.
+  const childMatches = useChildMatches();
+
+  // Redirect anonymous visits to the login page; a signed-out signal on a
+  // mount that has seen a user is an explicit logout, and the header's own
+  // navigation takes over (see ProfilePage for the reasoning).
+  const hadUser = useRef(false);
+  if (user) hadUser.current = true;
 
   useEffect(() => {
-    if (!authLoading && !user) navigate({ to: "/login", search: { redirect: "/orders" }, replace: true });
+    if (!authLoading && !user && !hadUser.current)
+      navigate({ to: "/login", search: { redirect: "/orders" }, replace: true });
   }, [user, authLoading, navigate]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["orders"],
     queryFn: () => apiGet<{ orders: ApiOrder[] }>("/api/orders"),
-    enabled: !!user,
+    enabled: !!user && childMatches.length === 0,
     retry: 1,
   });
 
+  if (childMatches.length > 0) return <Outlet />;
   if (!user) return null;
 
   return (
@@ -56,7 +73,9 @@ function OrdersPage() {
           <PackageOpen className="size-12 text-muted-foreground" />
           <p className="mt-4 font-display text-lg font-semibold text-primary-deep">No orders yet</p>
           <Button asChild className="mt-6">
-            <Link to="/shop" search={{}}>{t("shopNow")}</Link>
+            <Link to="/shop" search={{}}>
+              {t("shopNow")}
+            </Link>
           </Button>
         </div>
       ) : (
@@ -71,13 +90,19 @@ function OrdersPage() {
                 <div>
                   <p className="font-display font-bold text-primary-deep">{o.orderNumber}</p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(o.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} ·{" "}
-                    {o.items?.length ?? 0} item{(o.items?.length ?? 0) === 1 ? "" : "s"}
+                    {new Date(o.createdAt).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}{" "}
+                    · {o.items?.length ?? 0} item{(o.items?.length ?? 0) === 1 ? "" : "s"}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <StatusBadge status={o.status} />
-                  <span className="font-display text-lg font-bold text-primary-deep">{formatINR(o.total)}</span>
+                  <span className="font-display text-lg font-bold text-primary-deep">
+                    {formatINR(o.total)}
+                  </span>
                 </div>
               </Link>
             </li>

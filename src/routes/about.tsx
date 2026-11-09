@@ -7,8 +7,17 @@ export const Route = createFileRoute("/about")({
       { title: "Our Story | Pistara" },
       { name: "description", content: "How Pistara sources and packs India's finest dry fruits." },
       { property: "og:title", content: "Our Story | Pistara" },
-      { property: "og:description", content: "How Pistara sources and packs India's finest dry fruits." },
+      {
+        property: "og:description",
+        content: "How Pistara sources and packs India's finest dry fruits.",
+      },
     ],
   }),
-  component: () => <ComingNext title="Our" accent="Story" text="Our brand story, values and sourcing page arrive in the next step." />,
+  component: () => (
+    <ComingNext
+      title="Our"
+      accent="Story"
+      text="Our brand story, values and sourcing page arrive in the next step."
+    />
+  ),
 });

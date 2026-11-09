@@ -1,11 +1,14 @@
 // Local E2E server: serves the Vercel-style /api handlers in-process and
 // proxies everything else to the Vite dev server, so Playwright can drive the
 // real frontend against the real API + a fresh test database.
+// E2E_ENV_FILE selects the env file: ".env.test" (Playwright, resets the test
+// DB) or ".env" (local dev against your own database — no reset).
 import http from "node:http";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { config } from "dotenv";
 
-config({ path: ".env.test", override: true });
+config({ path: process.env.E2E_ENV_FILE ?? ".env.test", override: true });
 
 const API_PORT = Number(process.env.E2E_PORT ?? 8090);
 const VITE_ORIGIN = process.env.E2E_VITE_ORIGIN ?? "http://localhost:8080";
@@ -54,7 +57,7 @@ const handlerCache = new Map<string, Handler>();
 async function loadHandler(file: string): Promise<Handler> {
   let h = handlerCache.get(file);
   if (!h) {
-    const mod = await import(path.resolve(process.cwd(), "api", file));
+    const mod = await import(pathToFileURL(path.resolve(process.cwd(), "api", file)).href);
     h = (mod.default ?? mod) as Handler;
     handlerCache.set(file, h);
   }
@@ -132,8 +135,15 @@ const server = http.createServer(async (req, res) => {
 });
 
 async function main() {
-  const { resetTestDb } = await import("../../db/reset-test-db");
-  await resetTestDb();
+  // Only ever reset a database whose URL contains "test" — never production.
+  if ((process.env.TURSO_DATABASE_URL ?? "").includes("test")) {
+    const { resetTestDb } = await import("../../db/reset-test-db");
+    await resetTestDb();
+  } else {
+    console.log(
+      `Database ${process.env.TURSO_DATABASE_URL ?? "(unset)"} is not a test DB — skipping reset.`,
+    );
+  }
   server.listen(API_PORT, () => {
     console.log(`E2E server on http://localhost:${API_PORT} (proxying to ${VITE_ORIGIN})`);
   });

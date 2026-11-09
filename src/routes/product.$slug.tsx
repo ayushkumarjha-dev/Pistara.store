@@ -65,7 +65,10 @@ function ProductPage() {
   const { product, related } = data;
   const name = lang === "hi" ? product.nameHi : product.name;
   const description = lang === "hi" ? product.descriptionHi : product.description;
-  const variant = product.variants.find((v) => v.id === variantId) ?? product.variants.find((v) => v.isActive) ?? product.variants[0]!;
+  const variant =
+    product.variants.find((v) => v.id === variantId) ??
+    product.variants.find((v) => v.isActive) ??
+    product.variants[0]!;
   const outOfStock = variant.stock <= 0 || !variant.isActive;
 
   const addToCart = (thenGoToCart: boolean) => {
@@ -78,15 +81,25 @@ function ProductPage() {
   return (
     <div className="container-page section-y">
       <nav className="text-xs text-muted-foreground" aria-label="Breadcrumb">
-        <Link to="/" className="hover:text-primary">Home</Link> / <Link to="/shop" search={{}} className="hover:text-primary">Shop</Link> /{" "}
-        <span className="text-foreground">{name}</span>
+        <Link to="/" className="hover:text-primary">
+          Home
+        </Link>{" "}
+        /{" "}
+        <Link to="/shop" search={{}} className="hover:text-primary">
+          Shop
+        </Link>{" "}
+        / <span className="text-foreground">{name}</span>
       </nav>
 
       <div className="mt-8 grid gap-12 lg:grid-cols-2">
         {/* Gallery */}
         <div>
           <div className="overflow-hidden rounded-3xl border bg-olive-50 shadow-soft">
-            <img src={product.images[imgIdx] ?? product.images[0]} alt={name} className="aspect-square w-full object-cover" />
+            <img
+              src={product.images[imgIdx] ?? product.images[0]}
+              alt={name}
+              className="aspect-square w-full object-cover"
+            />
           </div>
           {product.images.length > 1 && (
             <div className="mt-4 flex gap-3">
@@ -96,7 +109,9 @@ function ProductPage() {
                   onClick={() => setImgIdx(i)}
                   className={cn(
                     "overflow-hidden rounded-2xl border-2 transition-colors",
-                    i === imgIdx ? "border-gold" : "border-transparent opacity-70 hover:opacity-100",
+                    i === imgIdx
+                      ? "border-gold"
+                      : "border-transparent opacity-70 hover:opacity-100",
                   )}
                   aria-label={`Image ${i + 1}`}
                 >
@@ -115,7 +130,9 @@ function ProductPage() {
           <h1 className="mt-4 font-display text-4xl font-extrabold text-primary-deep">{name}</h1>
           <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
             <Stars value={product.rating} />
-            <span>{product.rating} · {product.reviews} reviews</span>
+            <span>
+              {product.rating} · {product.reviews} reviews
+            </span>
           </div>
           <p className="mt-5 leading-relaxed text-muted-foreground">{description}</p>
 
@@ -130,13 +147,20 @@ function ProductPage() {
                   disabled={!v.isActive}
                   className={cn(
                     "rounded-2xl border-2 px-5 py-3 text-left transition-colors",
-                    v.id === variant.id ? "border-gold bg-gold/10" : "border-border hover:border-primary/40",
+                    v.id === variant.id
+                      ? "border-gold bg-gold/10"
+                      : "border-border hover:border-primary/40",
                     !v.isActive && "opacity-40",
                   )}
                 >
-                  <span className="block font-display text-sm font-bold text-primary-deep">{v.label}</span>
+                  <span className="block font-display text-sm font-bold text-primary-deep">
+                    {v.label}
+                  </span>
                   <span className="block text-xs text-muted-foreground">
-                    {formatINR(v.price)} {v.stock <= 5 && v.stock > 0 && <em className="text-destructive not-italic">· only {v.stock} left</em>}
+                    {formatINR(v.price)}{" "}
+                    {v.stock <= 5 && v.stock > 0 && (
+                      <em className="text-destructive not-italic">· only {v.stock} left</em>
+                    )}
                     {v.stock <= 0 && <em className="text-destructive not-italic">· sold out</em>}
                   </span>
                 </button>
@@ -145,8 +169,12 @@ function ProductPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap items-baseline gap-3">
-            <span className="font-display text-4xl font-extrabold text-primary-deep">{formatINR(variant.price)}</span>
-            <span className="text-lg text-muted-foreground line-through">{formatINR(variant.mrp)}</span>
+            <span className="font-display text-4xl font-extrabold text-primary-deep">
+              {formatINR(variant.price)}
+            </span>
+            <span className="text-lg text-muted-foreground line-through">
+              {formatINR(variant.mrp)}
+            </span>
             <span className="rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success">
               {discountPct(variant.price, variant.mrp)}% off
             </span>
@@ -155,7 +183,11 @@ function ProductPage() {
           {/* Qty + actions */}
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <div className="flex items-center rounded-full border">
-              <button className="grid size-11 place-items-center" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease quantity">
+              <button
+                className="grid size-11 place-items-center"
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
+              >
                 <Minus className="size-4" />
               </button>
               <span className="w-8 text-center font-display font-bold">{qty}</span>
@@ -176,8 +208,12 @@ function ProductPage() {
           </div>
 
           <div className="mt-8 grid gap-3 rounded-2xl border bg-card p-5 text-sm text-muted-foreground sm:grid-cols-2">
-            <span className="flex items-center gap-2"><Truck className="size-4 text-primary" /> Flat ₹50 delivery · 2–5 days</span>
-            <span className="flex items-center gap-2"><ShieldCheck className="size-4 text-primary" /> Hygienically packed, FSSAI certified</span>
+            <span className="flex items-center gap-2">
+              <Truck className="size-4 text-primary" /> Flat ₹50 delivery · 2–5 days
+            </span>
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="size-4 text-primary" /> Hygienically packed, FSSAI certified
+            </span>
           </div>
         </div>
       </div>

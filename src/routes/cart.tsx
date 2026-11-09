@@ -41,7 +41,9 @@ function CartPage() {
     },
     onError: (err) => {
       if (err instanceof ApiError && err.code === "PROFILE_INCOMPLETE") {
-        toast.error("Please complete your profile first", { description: "We need your phone and address for delivery." });
+        toast.error("Please complete your profile first", {
+          description: "We need your phone and address for delivery.",
+        });
         navigate({ to: "/profile" });
         return;
       }
@@ -55,10 +57,13 @@ function CartPage() {
         <span className="grid size-20 place-items-center rounded-full bg-success/15 text-success">
           <PackageOpen className="size-10" />
         </span>
-        <h1 className="mt-6 font-display text-4xl font-extrabold text-primary-deep">Order placed!</h1>
+        <h1 className="mt-6 font-display text-4xl font-extrabold text-primary-deep">
+          Order placed!
+        </h1>
         <p className="mt-3 max-w-md text-muted-foreground">
-          Your order <b className="text-foreground">{placed.order.orderNumber}</b> of {formatINR(placed.order.total)} is confirmed.
-          Send the pre-filled WhatsApp message to complete payment and tracking.
+          Your order <b className="text-foreground">{placed.order.orderNumber}</b> of{" "}
+          {formatINR(placed.order.total)} is confirmed. Send the pre-filled WhatsApp message to
+          complete payment and tracking.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button variant="whatsapp" size="lg" asChild>
@@ -80,10 +85,14 @@ function CartPage() {
         <span className="grid size-20 place-items-center rounded-full bg-sage text-primary">
           <PackageOpen className="size-10" />
         </span>
-        <h1 className="mt-6 font-display text-4xl font-extrabold text-primary-deep">Your cart is empty</h1>
+        <h1 className="mt-6 font-display text-4xl font-extrabold text-primary-deep">
+          Your cart is empty
+        </h1>
         <p className="mt-3 text-muted-foreground">Fill it with something crunchy and wholesome.</p>
         <Button asChild size="lg" className="mt-8">
-          <Link to="/shop" search={{}}>{t("shopNow")}</Link>
+          <Link to="/shop" search={{}}>
+            {t("shopNow")}
+          </Link>
         </Button>
       </div>
     );
@@ -103,25 +112,42 @@ function CartPage() {
             ))}
           {!cart.isLoading &&
             cart.detailed.map(({ line, product, variant }) => (
-              <li key={line.variantId} className="flex gap-4 rounded-2xl border bg-card p-4 shadow-soft">
+              <li
+                key={line.variantId}
+                className="flex gap-4 rounded-2xl border bg-card p-4 shadow-soft"
+              >
                 <Link to="/product/$slug" params={{ slug: product.slug }} className="shrink-0">
                   <img src={product.images[0]} alt="" className="size-24 rounded-xl object-cover" />
                 </Link>
                 <div className="flex flex-1 flex-col">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <Link to="/product/$slug" params={{ slug: product.slug }} className="font-display font-semibold text-primary-deep hover:text-primary">
+                      <Link
+                        to="/product/$slug"
+                        params={{ slug: product.slug }}
+                        className="font-display font-semibold text-primary-deep hover:text-primary"
+                      >
                         {lang === "hi" ? product.nameHi : product.name}
                       </Link>
-                      <p className="text-xs text-muted-foreground">{variant.label} · {formatINR(variant.price)} each</p>
+                      <p className="text-xs text-muted-foreground">
+                        {variant.label} · {formatINR(variant.price)} each
+                      </p>
                     </div>
-                    <button onClick={() => cart.remove(line.variantId)} aria-label="Remove item" className="text-muted-foreground hover:text-destructive">
+                    <button
+                      onClick={() => cart.remove(line.variantId)}
+                      aria-label="Remove item"
+                      className="text-muted-foreground hover:text-destructive"
+                    >
                       <Trash2 className="size-4" />
                     </button>
                   </div>
                   <div className="mt-auto flex items-center justify-between pt-2">
                     <div className="flex items-center rounded-full border">
-                      <button className="grid size-9 place-items-center" onClick={() => cart.setQty(line.variantId, line.qty - 1)} aria-label="Decrease">
+                      <button
+                        className="grid size-9 place-items-center"
+                        onClick={() => cart.setQty(line.variantId, line.qty - 1)}
+                        aria-label="Decrease"
+                      >
                         <Minus className="size-3.5" />
                       </button>
                       <span className="w-7 text-center text-sm font-bold">{line.qty}</span>
@@ -134,7 +160,9 @@ function CartPage() {
                         <Plus className="size-3.5" />
                       </button>
                     </div>
-                    <span className="font-display text-lg font-bold text-primary-deep">{formatINR(variant.price * line.qty)}</span>
+                    <span className="font-display text-lg font-bold text-primary-deep">
+                      {formatINR(variant.price * line.qty)}
+                    </span>
                   </div>
                 </div>
               </li>
@@ -154,21 +182,32 @@ function CartPage() {
             </div>
             <div className="flex justify-between border-t pt-3 text-base">
               <dt className="font-display font-bold text-primary-deep">{t("total")}</dt>
-              <dd className="font-display text-xl font-extrabold text-primary-deep">{formatINR(cart.total)}</dd>
+              <dd className="font-display text-xl font-extrabold text-primary-deep">
+                {formatINR(cart.total)}
+              </dd>
             </div>
           </dl>
           {authLoading ? null : !user ? (
             <Button size="lg" className="mt-6 w-full" asChild>
-              <Link to="/login" search={{ redirect: "/cart" }}>Sign in to checkout</Link>
+              <Link to="/login" search={{ redirect: "/cart" }}>
+                Sign in to checkout
+              </Link>
             </Button>
           ) : (
-            <Button size="lg" className="mt-6 w-full" disabled={checkout.isPending || cart.isLoading} onClick={() => checkout.mutate()}>
+            <Button
+              size="lg"
+              className="mt-6 w-full"
+              disabled={checkout.isPending || cart.isLoading}
+              onClick={() => checkout.mutate()}
+            >
               {checkout.isPending && <Loader2 className="animate-spin" />}
               Place order · WhatsApp
             </Button>
           )}
           <Button variant="ghost" className="mt-2 w-full" asChild>
-            <Link to="/shop" search={{}}><ArrowLeft /> Continue shopping</Link>
+            <Link to="/shop" search={{}}>
+              <ArrowLeft /> Continue shopping
+            </Link>
           </Button>
           <p className="mt-4 text-center text-xs text-muted-foreground">
             Payment is completed on WhatsApp after you place the order.

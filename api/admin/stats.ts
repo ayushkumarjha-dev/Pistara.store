@@ -4,7 +4,13 @@ import { orders, productVariants, products, users } from "../../db/schema";
 import { handler, HttpError } from "../../server-lib/http";
 import { requireAdmin } from "../../server-lib/auth";
 
-const REVENUE_STATUSES = ["PAYMENT_CONFIRMED", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"] as const;
+const REVENUE_STATUSES = [
+  "PAYMENT_CONFIRMED",
+  "PACKED",
+  "SHIPPED",
+  "OUT_FOR_DELIVERY",
+  "DELIVERED",
+] as const;
 
 export default handler({
   methods: ["GET"],
@@ -16,7 +22,10 @@ export default handler({
     const [totals] = await db
       .select({
         totalOrders: sql<number>`count(*)`,
-        revenue: sql<number>`coalesce(sum(case when ${orders.status} in (${sql.join(REVENUE_STATUSES.map((s) => sql`${s}`), sql`, `)}) then ${orders.total} else 0 end), 0)`,
+        revenue: sql<number>`coalesce(sum(case when ${orders.status} in (${sql.join(
+          REVENUE_STATUSES.map((s) => sql`${s}`),
+          sql`, `,
+        )}) then ${orders.total} else 0 end), 0)`,
         pendingOrders: sql<number>`coalesce(sum(case when ${orders.status} = 'PENDING' then 1 else 0 end), 0)`,
       })
       .from(orders);
@@ -35,7 +44,13 @@ export default handler({
       })
       .from(productVariants)
       .innerJoin(products, eq(products.id, productVariants.productId))
-      .where(and(lte(productVariants.stock, 5), eq(productVariants.isActive, true), eq(products.isActive, true)));
+      .where(
+        and(
+          lte(productVariants.stock, 5),
+          eq(productVariants.isActive, true),
+          eq(products.isActive, true),
+        ),
+      );
 
     const recentOrders = await db.select().from(orders).orderBy(desc(orders.createdAt)).limit(5);
 
@@ -49,7 +64,10 @@ export default handler({
       .select({
         day: sql<string>`strftime('%Y-%m-%d', ${orders.createdAt} / 1000, 'unixepoch')`,
         count: sql<number>`count(*)`,
-        revenue: sql<number>`coalesce(sum(case when ${orders.status} in (${sql.join(REVENUE_STATUSES.map((s) => sql`${s}`), sql`, `)}) then ${orders.total} else 0 end), 0)`,
+        revenue: sql<number>`coalesce(sum(case when ${orders.status} in (${sql.join(
+          REVENUE_STATUSES.map((s) => sql`${s}`),
+          sql`, `,
+        )}) then ${orders.total} else 0 end), 0)`,
       })
       .from(orders)
       .where(gte(orders.createdAt, sinceMs))

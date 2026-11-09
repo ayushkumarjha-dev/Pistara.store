@@ -28,7 +28,9 @@ export function handler<B = unknown>(opts: HandlerOptions<B>) {
     try {
       if (!opts.methods.includes(req.method as Method)) {
         res.setHeader("Allow", opts.methods.join(", "));
-        return res.status(405).json({ error: { code: "METHOD_NOT_ALLOWED", message: "Method not allowed" } });
+        return res
+          .status(405)
+          .json({ error: { code: "METHOD_NOT_ALLOWED", message: "Method not allowed" } });
       }
       let body = req.body as B;
       if (opts.body && req.method !== "GET" && req.method !== "DELETE") {

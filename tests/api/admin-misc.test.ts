@@ -18,7 +18,12 @@ describe("admin stats", () => {
     const { variant } = await getVariant("premium-makhana", "250g");
     const res = await createOrder(customer.jar, [{ variantId: variant.id, quantity: 2 }]);
     const orderId = res.body.data.order.id;
-    await call(adminOrderHandler, { method: "PATCH", jar, query: { id: orderId }, body: { status: "PAYMENT_CONFIRMED" } });
+    await call(adminOrderHandler, {
+      method: "PATCH",
+      jar,
+      query: { id: orderId },
+      body: { status: "PAYMENT_CONFIRMED" },
+    });
 
     const stats = await call(statsHandler, { jar, query: { range: "7" } });
     expect(stats.status).toBe(200);
@@ -29,7 +34,9 @@ describe("admin stats", () => {
     expect(d.series).toHaveLength(7);
     expect(d.recentOrders.length).toBeGreaterThanOrEqual(1);
     // low stock: roasted-makhana 1kg has stock 4
-    expect(d.lowStock.some((l: any) => l.productName === "Roasted Masala Makhana" && l.label === "1kg")).toBe(true);
+    expect(
+      d.lowStock.some((l: any) => l.productName === "Roasted Masala Makhana" && l.label === "1kg"),
+    ).toBe(true);
 
     const stats30 = await call(statsHandler, { jar, query: { range: "30" } });
     expect(stats30.body.data.series).toHaveLength(30);
@@ -95,7 +102,10 @@ describe("admin settings", () => {
     expect(newOrder.body.data.order.deliveryCharge).toBe(80);
     expect(newOrder.body.data.order.total).toBe(280 + 80);
 
-    const oldDetail = await call(adminOrderHandler, { jar, query: { id: oldOrder.body.data.order.id } });
+    const oldDetail = await call(adminOrderHandler, {
+      jar,
+      query: { id: oldOrder.body.data.order.id },
+    });
     expect(oldDetail.body.data.order.deliveryCharge).toBe(50);
   });
 

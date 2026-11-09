@@ -7,7 +7,9 @@ import { formatINR } from "@/lib/api";
 import { StatusBadge } from "@/components/shop/StatusBadge";
 
 export const Route = createFileRoute("/admin/")({
-  head: () => ({ meta: [{ title: "Dashboard | Pistara Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Dashboard | Pistara Admin" }, { name: "robots", content: "noindex" }],
+  }),
   component: AdminDashboard,
 });
 
@@ -22,10 +24,20 @@ interface Stats {
 }
 
 function AdminDashboard() {
-  const { data, isLoading } = useQuery({ queryKey: ["admin", "stats"], queryFn: () => apiGet<Stats>("/api/admin/stats"), retry: 1 });
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "stats"],
+    queryFn: () => apiGet<Stats>("/api/admin/stats"),
+    retry: 1,
+  });
 
   if (isLoading || !data) {
-    return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[0, 1, 2, 3].map((i) => <div key={i} className="h-28 animate-pulse rounded-2xl border bg-card" />)}</div>;
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-28 animate-pulse rounded-2xl border bg-card" />
+        ))}
+      </div>
+    );
   }
 
   const cards = [
@@ -40,7 +52,9 @@ function AdminDashboard() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
           <div key={c.label} className="rounded-2xl border bg-card p-5 shadow-soft">
-            <span className="grid size-10 place-items-center rounded-full bg-sage text-primary"><c.icon className="size-5" /></span>
+            <span className="grid size-10 place-items-center rounded-full bg-sage text-primary">
+              <c.icon className="size-5" />
+            </span>
             <p className="mt-3 font-display text-2xl font-extrabold text-primary-deep">{c.value}</p>
             <p className="text-xs text-muted-foreground">{c.label}</p>
           </div>
@@ -49,12 +63,19 @@ function AdminDashboard() {
 
       {data.lowStock.length > 0 && (
         <div className="rounded-2xl border border-gold/40 bg-gold/10 px-5 py-3 text-sm text-primary-deep">
-          <p className="font-semibold">{data.lowStock.length} variant{data.lowStock.length === 1 ? "" : "s"} low on stock:</p>
+          <p className="font-semibold">
+            {data.lowStock.length} variant{data.lowStock.length === 1 ? "" : "s"} low on stock:
+          </p>
           <p className="mt-1 text-muted-foreground">
-            {data.lowStock.slice(0, 5).map((l) => `${l.productName} ${l.label} (${l.stock})`).join(" · ")}
+            {data.lowStock
+              .slice(0, 5)
+              .map((l) => `${l.productName} ${l.label} (${l.stock})`)
+              .join(" · ")}
             {data.lowStock.length > 5 && " …"}
           </p>
-          <Link to="/admin/products" className="mt-1 inline-block font-semibold underline">Review inventory</Link>
+          <Link to="/admin/products" className="mt-1 inline-block font-semibold underline">
+            Review inventory
+          </Link>
         </div>
       )}
 
@@ -77,10 +98,15 @@ function AdminDashboard() {
         <h2 className="font-display text-lg font-bold text-primary-deep">Recent orders</h2>
         <ul className="mt-4 divide-y">
           {data.recentOrders.map((o) => (
-            <li key={o.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+            <li
+              key={o.id}
+              className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm"
+            >
               <div>
                 <p className="font-display font-semibold text-primary-deep">{o.orderNumber}</p>
-                <p className="text-xs text-muted-foreground">{o.customerName} · {new Date(o.createdAt).toLocaleDateString("en-IN")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {o.customerName} · {new Date(o.createdAt).toLocaleDateString("en-IN")}
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 <StatusBadge status={o.status} />
@@ -88,7 +114,9 @@ function AdminDashboard() {
               </div>
             </li>
           ))}
-          {data.recentOrders.length === 0 && <li className="py-6 text-center text-sm text-muted-foreground">No orders yet.</li>}
+          {data.recentOrders.length === 0 && (
+            <li className="py-6 text-center text-sm text-muted-foreground">No orders yet.</li>
+          )}
         </ul>
       </div>
     </div>

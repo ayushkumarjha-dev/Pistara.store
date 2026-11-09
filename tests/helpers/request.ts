@@ -58,7 +58,11 @@ export async function call(
   await handler(req as unknown as VercelRequest, res as unknown as VercelResponse);
 
   const setCookie = res.getHeader("set-cookie");
-  const setCookieHeaders = Array.isArray(setCookie) ? setCookie.map(String) : setCookie ? [String(setCookie)] : [];
+  const setCookieHeaders = Array.isArray(setCookie)
+    ? setCookie.map(String)
+    : setCookie
+      ? [String(setCookie)]
+      : [];
   opts.jar?.setFrom(setCookieHeaders);
 
   const cookies: Record<string, string> = {};

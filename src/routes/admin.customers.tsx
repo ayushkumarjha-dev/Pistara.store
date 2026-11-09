@@ -6,7 +6,9 @@ import { apiGet } from "@/lib/api-client";
 import { formatINR } from "@/lib/api";
 
 export const Route = createFileRoute("/admin/customers")({
-  head: () => ({ meta: [{ title: "Customers | Pistara Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Customers | Pistara Admin" }, { name: "robots", content: "noindex" }],
+  }),
   component: AdminCustomers,
 });
 
@@ -25,7 +27,10 @@ function AdminCustomers() {
   const [q, setQ] = useState("");
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "customers", q],
-    queryFn: () => apiGet<{ customers: Customer[]; total: number }>(`/api/admin/customers${q ? `?q=${encodeURIComponent(q)}` : ""}`),
+    queryFn: () =>
+      apiGet<{ customers: Customer[]; total: number }>(
+        `/api/admin/customers${q ? `?q=${encodeURIComponent(q)}` : ""}`,
+      ),
     retry: 1,
   });
 
@@ -66,12 +71,16 @@ function AdminCustomers() {
                 <td className="p-4">{c.city ?? "—"}</td>
                 <td className="p-4">{c.orderCount}</td>
                 <td className="p-4 font-semibold">{formatINR(c.totalSpent)}</td>
-                <td className="p-4 text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString("en-IN")}</td>
+                <td className="p-4 text-xs text-muted-foreground">
+                  {new Date(c.createdAt).toLocaleDateString("en-IN")}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
-        {!isLoading && data?.customers.length === 0 && <p className="p-8 text-center text-sm text-muted-foreground">No customers found.</p>}
+        {!isLoading && data?.customers.length === 0 && (
+          <p className="p-8 text-center text-sm text-muted-foreground">No customers found.</p>
+        )}
       </div>
     </div>
   );

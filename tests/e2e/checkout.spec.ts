@@ -80,4 +80,46 @@ test.describe("customer journey", () => {
     await page.locator("form").getByRole("button", { name: "Login" }).click();
     await expect(page.getByText(/invalid|incorrect/i)).toBeVisible();
   });
+
+  test("change password works and the old password stops working", async ({ page }) => {
+    const pwEmail = `e2e-pw-${Date.now()}@test.pistara`;
+    const oldPw = "TestPass123!";
+    const newPw = "NewPass456!";
+
+    // Register a fresh account
+    await page.goto("/login");
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Register" }).click();
+    await expect(page.getByLabel("Full name")).toBeVisible();
+    await page.getByLabel("Full name").fill("E2E Password");
+    await page.getByLabel("Email").fill(pwEmail);
+    await page.getByLabel("Password").fill(oldPw);
+    await page.getByRole("button", { name: "Create account" }).click();
+    await expect(page).toHaveURL(/\/profile/);
+
+    // Change password from the profile card
+    await page.getByLabel("Current password").fill(oldPw);
+    await page.getByLabel("New password", { exact: true }).fill(newPw);
+    await page.getByLabel("Confirm new password").fill(newPw);
+    await page.getByRole("button", { name: "Update password" }).click();
+    await expect(page.getByText("Password changed")).toBeVisible();
+
+    // Log out from the header dropdown
+    await page.locator("header").getByRole("button", { name: "E2E" }).click();
+    await page.getByRole("menuitem", { name: "Logout" }).click();
+    await expect(page).toHaveURL(/\/$/);
+
+    // Old password is rejected
+    await page.goto("/login");
+    await page.waitForLoadState("networkidle");
+    await page.getByLabel("Email").fill(pwEmail);
+    await page.getByLabel("Password").fill(oldPw);
+    await page.locator("form").getByRole("button", { name: "Login" }).click();
+    await expect(page.getByText(/invalid|incorrect/i)).toBeVisible();
+
+    // New password signs in
+    await page.getByLabel("Password").fill(newPw);
+    await page.locator("form").getByRole("button", { name: "Login" }).click();
+    await expect(page).toHaveURL(/\/profile/);
+  });
 });

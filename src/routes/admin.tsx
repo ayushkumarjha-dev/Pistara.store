@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, Package, Settings, ShoppingCart, Users } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -27,10 +27,19 @@ function AdminLayout() {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
+  // Redirect anonymous visits to the login page; a signed-out signal on a
+  // mount that has seen a user is an explicit logout, and the header's own
+  // navigation takes over (see ProfilePage in profile.tsx for the reasoning).
+  // The same applies to the non-admin bounce below.
+  const hadUser = useRef(false);
+  if (user) hadUser.current = true;
+
   useEffect(() => {
     if (loading) return;
-    if (!user) navigate({ to: "/login", search: { redirect: "/admin" }, replace: true });
-    else if (!isAdmin) navigate({ to: "/", replace: true });
+    if (!user) {
+      if (hadUser.current) return;
+      navigate({ to: "/login", search: { redirect: "/admin" }, replace: true });
+    } else if (!isAdmin) navigate({ to: "/", replace: true });
   }, [user, isAdmin, loading, navigate]);
 
   if (!user || !isAdmin) return null;
@@ -50,7 +59,10 @@ function AdminLayout() {
               className={cn(
                 "flex items-center gap-3 rounded-xl px-4 py-2.5 font-display text-sm font-semibold text-muted-foreground transition-colors hover:bg-sage hover:text-primary-deep",
               )}
-              activeProps={{ className: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground" }}
+              activeProps={{
+                className:
+                  "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+              }}
             >
               <n.icon className="size-4" /> {n.label}
             </Link>

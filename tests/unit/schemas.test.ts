@@ -14,7 +14,14 @@ describe("mobile schema", () => {
     expect(mobileSchema.safeParse("6123456789").success).toBe(true);
   });
   it("rejects invalid mobiles", () => {
-    for (const m of ["1234567890", "5876543210", "987654321", "98765432109", "98765 43210", "abcdefghij"]) {
+    for (const m of [
+      "1234567890",
+      "5876543210",
+      "987654321",
+      "98765432109",
+      "98765 43210",
+      "abcdefghij",
+    ]) {
       expect(mobileSchema.safeParse(m).success).toBe(false);
     }
   });

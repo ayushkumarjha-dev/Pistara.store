@@ -6,7 +6,13 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { formatINR, getProducts } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 
-export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+export function SearchOverlay({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+}) {
   const [q, setQ] = useState("");
   const [debounced, setDebounced] = useState("");
   const { t, lang } = useI18n();
@@ -19,7 +25,8 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
 
   const { data } = useQuery({
     queryKey: ["search", debounced],
-    queryFn: () => getProducts(debounced ? { q: debounced, limit: 8 } : { featured: true, limit: 4 }),
+    queryFn: () =>
+      getProducts(debounced ? { q: debounced, limit: 8 } : { featured: true, limit: 4 }),
     enabled: open,
     staleTime: 30_000,
     retry: 1,
@@ -41,7 +48,11 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
           />
         </div>
         <ul className="max-h-96 overflow-y-auto p-2">
-          {results.length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">No products match “{q}”.</li>}
+          {results.length === 0 && (
+            <li className="p-6 text-center text-sm text-muted-foreground">
+              No products match “{q}”.
+            </li>
+          )}
           {results.map((p) => (
             <li key={p.id}>
               <button
@@ -52,8 +63,12 @@ export function SearchOverlay({ open, onOpenChange }: { open: boolean; onOpenCha
                 className="flex w-full items-center gap-4 rounded-2xl p-3 text-left transition-colors hover:bg-sage focus-visible:bg-sage"
               >
                 <img src={p.images[0]} alt="" className="size-12 rounded-xl object-cover" />
-                <span className="flex-1 font-display text-sm font-semibold">{lang === "hi" ? p.nameHi : p.name}</span>
-                <span className="text-sm text-muted-foreground">{formatINR(p.fromPrice ?? p.variants[0]?.price ?? 0)}</span>
+                <span className="flex-1 font-display text-sm font-semibold">
+                  {lang === "hi" ? p.nameHi : p.name}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {formatINR(p.fromPrice ?? p.variants[0]?.price ?? 0)}
+                </span>
               </button>
             </li>
           ))}

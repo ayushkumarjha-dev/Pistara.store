@@ -3,6 +3,8 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
+import { pathToFileURL } from "node:url";
+import { config } from "dotenv";
 import { seed } from "./seed";
 
 const TABLES = [
@@ -41,7 +43,9 @@ export async function resetTestDb() {
   console.log("Test database reset and seeded");
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // CLI entry: load the test env explicitly (never the production .env).
+  config({ path: ".env.test", override: true });
   resetTestDb().catch((e) => {
     console.error(e);
     process.exit(1);

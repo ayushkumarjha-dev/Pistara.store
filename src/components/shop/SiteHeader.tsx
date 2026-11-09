@@ -43,7 +43,9 @@ export function SiteHeader() {
 
   return (
     <>
-      <div className="bg-primary-deep px-4 py-2 text-center text-xs font-medium tracking-wide text-gold">{t("announce")}</div>
+      <div className="bg-primary-deep px-4 py-2 text-center text-xs font-medium tracking-wide text-gold">
+        {t("announce")}
+      </div>
       <header
         className={cn(
           "sticky top-0 z-40 transition-all duration-300",
@@ -52,7 +54,11 @@ export function SiteHeader() {
       >
         <div className="container-page flex h-18 items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <button className="grid size-10 place-items-center rounded-full hover:bg-sage md:hidden" onClick={() => setMenuOpen(true)} aria-label="Open menu">
+            <button
+              className="grid size-10 place-items-center rounded-full hover:bg-sage md:hidden"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+            >
               <Menu className="size-5" />
             </button>
             <Logo />
@@ -72,22 +78,39 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <button className="grid size-10 place-items-center rounded-full transition-colors hover:bg-sage" onClick={() => setSearchOpen(true)} aria-label="Search">
+            <button
+              className="grid size-10 place-items-center rounded-full transition-colors hover:bg-sage"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+            >
               <Search className="size-5" />
             </button>
-            <div className="hidden rounded-full border bg-card p-0.5 text-xs font-semibold sm:flex" role="group" aria-label="Language">
+            <div
+              className="hidden rounded-full border bg-card p-0.5 text-xs font-semibold sm:flex"
+              role="group"
+              aria-label="Language"
+            >
               {(["en", "hi"] as const).map((l) => (
                 <button
                   key={l}
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
-                  className={cn("rounded-full px-2.5 py-1 transition-colors", lang === l ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 transition-colors",
+                    lang === l
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
                 >
                   {l === "en" ? "EN" : "हिं"}
                 </button>
               ))}
             </div>
-            <button className="relative grid size-10 place-items-center rounded-full transition-colors hover:bg-sage" onClick={() => cart.setOpen(true)} aria-label={`Cart, ${cart.count} items`}>
+            <button
+              className="relative grid size-10 place-items-center rounded-full transition-colors hover:bg-sage"
+              onClick={() => cart.setOpen(true)}
+              aria-label={`Cart, ${cart.count} items`}
+            >
               <ShoppingBag className="size-5" />
               <AnimatePresence>
                 {cart.count > 0 && (
@@ -124,6 +147,10 @@ export function SiteHeader() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={async () => {
+                      // logout() clears the session; guarded routes stay put
+                      // (they have seen a user, so they treat the becoming
+                      // null as "we just logged out") and our navigation home
+                      // is the last word — see the guarded routes.
                       await logout();
                       navigate({ to: "/" });
                     }}
@@ -166,7 +193,12 @@ export function SiteHeader() {
           </nav>
           <div className="mt-8 flex gap-2">
             {(["en", "hi"] as const).map((l) => (
-              <Button key={l} variant={lang === l ? "default" : "outline"} size="sm" onClick={() => setLang(l)}>
+              <Button
+                key={l}
+                variant={lang === l ? "default" : "outline"}
+                size="sm"
+                onClick={() => setLang(l)}
+              >
                 {l === "en" ? "English" : "हिंदी"}
               </Button>
             ))}
@@ -187,6 +219,7 @@ export function SiteHeader() {
               <Button
                 onClick={async () => {
                   setMenuOpen(false);
+                  // Same contract as the desktop menu (see src/lib/auth.tsx).
                   await logout();
                   navigate({ to: "/" });
                 }}
@@ -196,7 +229,9 @@ export function SiteHeader() {
             </div>
           ) : (
             <Button asChild className="mt-6 w-full" onClick={() => setMenuOpen(false)}>
-              <Link to="/login" search={{ redirect: undefined }}>{t("login")}</Link>
+              <Link to="/login" search={{ redirect: undefined }}>
+                {t("login")}
+              </Link>
             </Button>
           )}
         </SheetContent>

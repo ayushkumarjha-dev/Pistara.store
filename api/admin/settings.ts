@@ -25,7 +25,10 @@ export default handler({
       await db
         .insert(settings)
         .values({ key, value: String(value), updatedAt: now })
-        .onConflictDoUpdate({ target: settings.key, set: { value: String(value), updatedAt: now } });
+        .onConflictDoUpdate({
+          target: settings.key,
+          set: { value: String(value), updatedAt: now },
+        });
     }
 
     const rows = await db.select().from(settings);

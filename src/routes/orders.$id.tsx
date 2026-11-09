@@ -1,9 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, CheckCircle2, Circle, Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { ApiError, apiGet, apiPost, type ApiHistoryRow, type ApiOrder, type ApiOrderItem, type OrderStatus } from "@/lib/api-client";
+import {
+  ApiError,
+  apiGet,
+  apiPost,
+  type ApiHistoryRow,
+  type ApiOrder,
+  type ApiOrderItem,
+  type OrderStatus,
+} from "@/lib/api-client";
 import { formatINR } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useSettings } from "@/lib/settings";
@@ -24,7 +32,14 @@ export const Route = createFileRoute("/orders/$id")({
   component: OrderDetailPage,
 });
 
-const STEPS: OrderStatus[] = ["PENDING", "PAYMENT_CONFIRMED", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
+const STEPS: OrderStatus[] = [
+  "PENDING",
+  "PAYMENT_CONFIRMED",
+  "PACKED",
+  "SHIPPED",
+  "OUT_FOR_DELIVERY",
+  "DELIVERED",
+];
 
 interface OrderDetail {
   order: ApiOrder;
@@ -39,8 +54,15 @@ function OrderDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  // Redirect anonymous visits to the login page; a signed-out signal on a
+  // mount that has seen a user is an explicit logout, and the header's own
+  // navigation takes over (see ProfilePage for the reasoning).
+  const hadUser = useRef(false);
+  if (user) hadUser.current = true;
+
   useEffect(() => {
-    if (!authLoading && !user) navigate({ to: "/login", search: { redirect: `/orders/${id}` }, replace: true });
+    if (!authLoading && !user && !hadUser.current)
+      navigate({ to: "/login", search: { redirect: `/orders/${id}` }, replace: true });
   }, [user, authLoading, id, navigate]);
 
   const { data, isLoading, isError } = useQuery({
@@ -61,13 +83,19 @@ function OrderDetailPage() {
 
   if (!user) return null;
   if (isLoading) {
-    return <div className="container-page section-y max-w-3xl"><div className="h-64 animate-pulse rounded-3xl border bg-card" /></div>;
+    return (
+      <div className="container-page section-y max-w-3xl">
+        <div className="h-64 animate-pulse rounded-3xl border bg-card" />
+      </div>
+    );
   }
   if (isError || !data) {
     return (
       <div className="container-page section-y text-center">
         <h1 className="font-display text-3xl font-bold text-primary-deep">Order not found</h1>
-        <Button asChild className="mt-6"><Link to="/orders">Back to orders</Link></Button>
+        <Button asChild className="mt-6">
+          <Link to="/orders">Back to orders</Link>
+        </Button>
       </div>
     );
   }
@@ -79,14 +107,22 @@ function OrderDetailPage() {
   return (
     <div className="container-page section-y max-w-3xl">
       <Button variant="ghost" asChild>
-        <Link to="/orders"><ArrowLeft /> All orders</Link>
+        <Link to="/orders">
+          <ArrowLeft /> All orders
+        </Link>
       </Button>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-extrabold text-primary-deep">{order.orderNumber}</h1>
+          <h1 className="font-display text-3xl font-extrabold text-primary-deep">
+            {order.orderNumber}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Placed {new Date(order.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+            Placed{" "}
+            {new Date(order.createdAt).toLocaleString("en-IN", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}
           </p>
         </div>
         <StatusBadge status={order.status} />
@@ -103,24 +139,48 @@ function OrderDetailPage() {
                 ) : (
                   <Circle className="size-6 text-muted-foreground/40" />
                 )}
-                <span className={cn("max-w-16 text-center text-[0.6rem] font-medium leading-tight", i <= stepIdx ? "text-primary-deep" : "text-muted-foreground/60")}>
+                <span
+                  className={cn(
+                    "max-w-16 text-center text-[0.6rem] font-medium leading-tight",
+                    i <= stepIdx ? "text-primary-deep" : "text-muted-foreground/60",
+                  )}
+                >
                   {STATUS_LABELS[s]}
                 </span>
               </div>
-              {i < STEPS.length - 1 && <div className={cn("mx-1 mb-5 h-0.5 flex-1", i < stepIdx ? "bg-success" : "bg-border")} />}
+              {i < STEPS.length - 1 && (
+                <div
+                  className={cn("mx-1 mb-5 h-0.5 flex-1", i < stepIdx ? "bg-success" : "bg-border")}
+                />
+              )}
             </li>
           ))}
         </ol>
       ) : (
-        <p className="mt-8 rounded-2xl bg-destructive/10 px-5 py-3 text-sm text-destructive">This order was cancelled.</p>
+        <p className="mt-8 rounded-2xl bg-destructive/10 px-5 py-3 text-sm text-destructive">
+          This order was cancelled.
+        </p>
       )}
 
       {/* Tracking */}
       {order.trackingUrl && (
         <p className="mt-6 rounded-2xl border bg-card px-5 py-3 text-sm">
           Shipped via {order.courierName ?? "courier"}
-          {order.trackingId && <> · tracking <b>{order.trackingId}</b></>} —{" "}
-          <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="font-semibold text-primary underline">Track package</a>
+          {order.trackingId && (
+            <>
+              {" "}
+              · tracking <b>{order.trackingId}</b>
+            </>
+          )}{" "}
+          —{" "}
+          <a
+            href={order.trackingUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-primary underline"
+          >
+            Track package
+          </a>
         </p>
       )}
 
@@ -128,22 +188,35 @@ function OrderDetailPage() {
       <ul className="mt-10 space-y-3">
         {items.map((it) => (
           <li key={it.id} className="flex items-center gap-4 rounded-2xl border bg-card p-4">
-            {it.imageUrl && <img src={it.imageUrl} alt="" className="size-16 rounded-xl object-cover" />}
+            {it.imageUrl && (
+              <img src={it.imageUrl} alt="" className="size-16 rounded-xl object-cover" />
+            )}
             <div className="flex-1">
               <p className="font-display font-semibold text-primary-deep">{it.productName}</p>
-              <p className="text-xs text-muted-foreground">{it.variantLabel} × {it.quantity}</p>
+              <p className="text-xs text-muted-foreground">
+                {it.variantLabel} × {it.quantity}
+              </p>
             </div>
-            <span className="font-display font-bold text-primary-deep">{formatINR(it.lineTotal)}</span>
+            <span className="font-display font-bold text-primary-deep">
+              {formatINR(it.lineTotal)}
+            </span>
           </li>
         ))}
       </ul>
 
       {/* Totals */}
       <dl className="mt-6 space-y-2 rounded-2xl border bg-card p-5 text-sm">
-        <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{formatINR(order.subtotal)}</dd></div>
-        <div className="flex justify-between"><dt className="text-muted-foreground">Delivery</dt><dd>{formatINR(order.deliveryCharge)}</dd></div>
+        <div className="flex justify-between">
+          <dt className="text-muted-foreground">Subtotal</dt>
+          <dd>{formatINR(order.subtotal)}</dd>
+        </div>
+        <div className="flex justify-between">
+          <dt className="text-muted-foreground">Delivery</dt>
+          <dd>{formatINR(order.deliveryCharge)}</dd>
+        </div>
         <div className="flex justify-between border-t pt-2 font-display text-lg font-bold text-primary-deep">
-          <dt>Total</dt><dd>{formatINR(order.total)}</dd>
+          <dt>Total</dt>
+          <dd>{formatINR(order.total)}</dd>
         </div>
       </dl>
 
@@ -155,10 +228,17 @@ function OrderDetailPage() {
             {history.map((h) => (
               <li key={h.id} className="flex justify-between gap-4">
                 <span>
-                  <b className="text-foreground">{STATUS_LABELS[h.status as OrderStatus] ?? h.status}</b>
+                  <b className="text-foreground">
+                    {STATUS_LABELS[h.status as OrderStatus] ?? h.status}
+                  </b>
                   {h.note ? ` — ${h.note}` : ""}
                 </span>
-                <span className="shrink-0 text-xs">{new Date(h.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
+                <span className="shrink-0 text-xs">
+                  {new Date(h.createdAt).toLocaleString("en-IN", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </span>
               </li>
             ))}
           </ul>

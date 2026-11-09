@@ -8,7 +8,11 @@ const PORT = Number(process.env.E2E_PORT ?? 8090);
 export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 60_000,
-  retries: process.env.CI ? 1 : 0,
+  // Render all routes once during readiness (see tests/e2e/global-setup.ts)
+  // so cold-start SSR compile flake can't fail the first test of the suite;
+  // retries are a last-mile safety net for that same class of timing issue.
+  globalSetup: "./tests/e2e/global-setup.ts",
+  retries: process.env.CI ? 2 : 1,
   workers: 1,
   use: {
     baseURL: `http://localhost:${PORT}`,
@@ -23,10 +27,21 @@ export default defineConfig({
         }
       : {}),
   },
-  webServer: {
-    command: "bunx tsx tests/e2e/server.ts",
-    port: PORT,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command: "npm run dev",
+      port: 8080,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command: "npx tsx tests/e2e/server.ts",
+      port: PORT,
+      // Never reuse an already-running API server: if `npm run dev:api`
+      // (production DB) is up, silently reusing it would run E2E tests
+      // against production. Fail loudly on a busy port instead.
+      reuseExistingServer: false,
+      timeout: 120_000,
+    },
+  ],
 });

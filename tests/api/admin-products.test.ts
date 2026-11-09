@@ -38,7 +38,11 @@ describe("admin products CRUD", () => {
   it("creates a product with images and variants, visible in the public list", async () => {
     const { jar } = await loginAsAdmin();
     const catId = await categoryId(jar, "cashew");
-    const res = await call(adminProductsHandler, { method: "POST", jar, body: sampleProduct(catId) });
+    const res = await call(adminProductsHandler, {
+      method: "POST",
+      jar,
+      body: sampleProduct(catId),
+    });
     expect(res.status).toBe(200);
     expect(res.body.data.product.slug).toBe("test-almonds");
 
@@ -61,7 +65,11 @@ describe("admin products CRUD", () => {
   it("edits a product: change price, remove a variant, change primary image", async () => {
     const { jar } = await loginAsAdmin();
     const catId = await categoryId(jar, "cashew");
-    const created = await call(adminProductsHandler, { method: "POST", jar, body: sampleProduct(catId) });
+    const created = await call(adminProductsHandler, {
+      method: "POST",
+      jar,
+      body: sampleProduct(catId),
+    });
     const id = created.body.data.product.id;
 
     const updated = await call(adminProductHandler, {
@@ -92,7 +100,11 @@ describe("admin products CRUD", () => {
   it("hard-deletes a product that was never ordered", async () => {
     const { jar } = await loginAsAdmin();
     const catId = await categoryId(jar, "cashew");
-    const created = await call(adminProductsHandler, { method: "POST", jar, body: sampleProduct(catId) });
+    const created = await call(adminProductsHandler, {
+      method: "POST",
+      jar,
+      body: sampleProduct(catId),
+    });
     const id = created.body.data.product.id;
 
     const del = await call(adminProductHandler, { method: "DELETE", jar, query: { id } });
@@ -107,7 +119,11 @@ describe("admin products CRUD", () => {
     const { product, variant } = await getVariant("black-raisins", "250g");
     await createOrder(customer.jar, [{ variantId: variant.id, quantity: 1 }]);
 
-    const del = await call(adminProductHandler, { method: "DELETE", jar: adminJar, query: { id: product.id } });
+    const del = await call(adminProductHandler, {
+      method: "DELETE",
+      jar: adminJar,
+      query: { id: product.id },
+    });
     expect(del.body.data.deleted).toBe("soft");
 
     const pub = await call(publicProductsHandler, { query: { q: "black", limit: "50" } });

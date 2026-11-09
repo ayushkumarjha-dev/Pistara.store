@@ -17,7 +17,9 @@ export interface WhatsAppOrderData {
 }
 
 export function buildWhatsAppMessage(o: WhatsAppOrderData): string {
-  const lines = o.items.map((it, i) => `${i + 1}. ${it.product} (${it.variant}) × ${it.qty} = ₹${it.line}`);
+  const lines = o.items.map(
+    (it, i) => `${i + 1}. ${it.product} (${it.variant}) × ${it.qty} = ₹${it.line}`,
+  );
   return [
     "🛒 *New Order, Pistara*",
     `Order ID: ${o.orderNumber}`,

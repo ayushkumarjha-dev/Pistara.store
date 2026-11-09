@@ -8,12 +8,18 @@ import { getSettings } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/settings")({
-  head: () => ({ meta: [{ title: "Settings | Pistara Admin" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Settings | Pistara Admin" }, { name: "robots", content: "noindex" }],
+  }),
   component: AdminSettings,
 });
 
 const FIELDS: { key: string; label: string; hint?: string; numeric?: boolean }[] = [
-  { key: "whatsapp_number", label: "WhatsApp number", hint: "Country code + number, digits only (e.g. 919876543210)" },
+  {
+    key: "whatsapp_number",
+    label: "WhatsApp number",
+    hint: "Country code + number, digits only (e.g. 919876543210)",
+  },
   { key: "delivery_charge", label: "Delivery charge (₹)", numeric: true },
   { key: "store_name", label: "Store name" },
   { key: "contact_email", label: "Contact email" },
@@ -67,7 +73,9 @@ function AdminSettings() {
       >
         {FIELDS.map((f) => (
           <div key={f.key}>
-            <label htmlFor={`s-${f.key}`} className="text-sm font-medium">{f.label}</label>
+            <label htmlFor={`s-${f.key}`} className="text-sm font-medium">
+              {f.label}
+            </label>
             <input
               id={`s-${f.key}`}
               type={f.numeric ? "number" : "text"}

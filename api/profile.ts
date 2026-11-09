@@ -13,13 +13,28 @@ export default handler({
 
     if (req.method === "GET") {
       const [user] = await db.select().from(users).where(eq(users.id, session.sub)).limit(1);
-      const [address] = await db.select().from(addresses).where(eq(addresses.userId, session.sub)).limit(1);
+      const [address] = await db
+        .select()
+        .from(addresses)
+        .where(eq(addresses.userId, session.sub))
+        .limit(1);
       const isComplete = Boolean(
-        user?.name && user?.mobile && address?.line1 && address?.city && address?.state && address?.pincode,
+        user?.name &&
+        user?.mobile &&
+        address?.line1 &&
+        address?.city &&
+        address?.state &&
+        address?.pincode,
       );
       return {
         user: user
-          ? { id: user.id, name: user.name, email: user.email, role: user.role, mobile: user.mobile }
+          ? {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+              mobile: user.mobile,
+            }
           : null,
         address: address ?? null,
         isComplete,
@@ -28,7 +43,10 @@ export default handler({
 
     const data = profileSchema.parse(body);
     const now = Date.now();
-    await db.update(users).set({ name: data.name, mobile: data.mobile, updatedAt: now }).where(eq(users.id, session.sub));
+    await db
+      .update(users)
+      .set({ name: data.name, mobile: data.mobile, updatedAt: now })
+      .where(eq(users.id, session.sub));
     await db
       .insert(addresses)
       .values({
@@ -55,9 +73,19 @@ export default handler({
       });
 
     const [user] = await db.select().from(users).where(eq(users.id, session.sub)).limit(1);
-    const [address] = await db.select().from(addresses).where(eq(addresses.userId, session.sub)).limit(1);
+    const [address] = await db
+      .select()
+      .from(addresses)
+      .where(eq(addresses.userId, session.sub))
+      .limit(1);
     return {
-      user: { id: user!.id, name: user!.name, email: user!.email, role: user!.role, mobile: user!.mobile },
+      user: {
+        id: user!.id,
+        name: user!.name,
+        email: user!.email,
+        role: user!.role,
+        mobile: user!.mobile,
+      },
       address,
       isComplete: true,
     };

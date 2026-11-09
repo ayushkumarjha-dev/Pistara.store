@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
+    "dev:api": "tsx scripts/dev-api.ts",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
@@ -16,8 +17,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx db/seed.ts",
-    "db:reset-test": "tsx -r dotenv/config db/reset-test-db.ts",
+    "db:seed": "tsx -r dotenv/config db/seed.ts",
+    "db:reset-test": "tsx db/reset-test-db.ts",
     "test:unit": "vitest run tests/unit",
     "test:api": "vitest run tests/api",
     "test:e2e": "playwright test",

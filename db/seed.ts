@@ -1,6 +1,7 @@
 // Idempotent seed: admin user, categories, products, settings. Safe to run twice.
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { pathToFileURL } from "node:url";
 import { getDb } from "./client";
 import { categories, products, productImages, productVariants, settings, users } from "./schema";
 import { seedCategories, seedProducts, seedSettings } from "./seed-data";
@@ -32,7 +33,11 @@ export async function seed() {
   // Categories
   const categoryIds = new Map<string, string>();
   for (const c of seedCategories) {
-    const [existing] = await db.select().from(categories).where(eq(categories.slug, c.slug)).limit(1);
+    const [existing] = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.slug, c.slug))
+      .limit(1);
     if (existing) {
       categoryIds.set(c.slug, existing.id);
     } else {
@@ -61,12 +66,12 @@ export async function seed() {
       createdAt: now,
       updatedAt: now,
     });
-    await db.insert(productImages).values(
-      p.images.map((url, i) => ({ productId: id, url, sortOrder: i, isPrimary: i === 0 })),
-    );
-    await db.insert(productVariants).values(
-      p.variants.map((sv) => ({ productId: id, ...sv, isActive: true })),
-    );
+    await db
+      .insert(productImages)
+      .values(p.images.map((url, i) => ({ productId: id, url, sortOrder: i, isPrimary: i === 0 })));
+    await db
+      .insert(productVariants)
+      .values(p.variants.map((sv) => ({ productId: id, ...sv, isActive: true })));
   }
 
   // Settings (WHATSAPP_NUMBER env overrides the default)
@@ -79,7 +84,7 @@ export async function seed() {
   console.log("Seed complete");
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   seed().catch((e) => {
     console.error(e);
     process.exit(1);

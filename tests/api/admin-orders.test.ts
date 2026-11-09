@@ -10,7 +10,11 @@ import { customerWithProfile, getVariant, createOrder, loginAsAdmin } from "../h
 import { getDb } from "../../db/client";
 import { productVariants } from "../../db/schema";
 
-async function setupOrder(variantSlug = "premium-makhana", label: "250g" | "500g" | "1kg" = "250g", qty = 2) {
+async function setupOrder(
+  variantSlug = "premium-makhana",
+  label: "250g" | "500g" | "1kg" = "250g",
+  qty = 2,
+) {
   const customer = await customerWithProfile();
   const { variant } = await getVariant(variantSlug, label);
   const res = await createOrder(customer.jar, [{ variantId: variant.id, quantity: qty }]);
@@ -52,7 +56,14 @@ describe("admin order pipeline", () => {
     expect(delivered.status).toBe(200);
 
     const statuses = delivered.body.data.history.map((h: any) => h.status);
-    expect(statuses).toEqual(["PENDING", "PAYMENT_CONFIRMED", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"]);
+    expect(statuses).toEqual([
+      "PENDING",
+      "PAYMENT_CONFIRMED",
+      "PACKED",
+      "SHIPPED",
+      "OUT_FOR_DELIVERY",
+      "DELIVERED",
+    ]);
   });
 
   it("deducts stock when skipping straight to a later status", async () => {
@@ -80,7 +91,10 @@ describe("admin order pipeline", () => {
     expect(res.body.error.code).toBe("INSUFFICIENT_STOCK");
     expect(res.body.error.message).toContain("Roasted Masala Makhana");
 
-    const [o] = await db.select().from((await import("../../db/schema")).orders).where(eq((await import("../../db/schema")).orders.id, order.id));
+    const [o] = await db
+      .select()
+      .from((await import("../../db/schema")).orders)
+      .where(eq((await import("../../db/schema")).orders.id, order.id));
     expect(o.status).toBe("PENDING");
     expect(o.stockDeducted).toBe(false);
     const [v] = await db.select().from(productVariants).where(eq(productVariants.id, variant.id));
@@ -108,16 +122,25 @@ describe("admin order pipeline", () => {
     // Case 1: deducted → restore
     const s1 = await setupOrder("premium-makhana", "250g", 2);
     const db = getDb();
-    const [before1] = await db.select().from(productVariants).where(eq(productVariants.id, s1.variant.id));
+    const [before1] = await db
+      .select()
+      .from(productVariants)
+      .where(eq(productVariants.id, s1.variant.id));
     await patch(s1.adminJar, s1.order.id, { status: "PAYMENT_CONFIRMED" });
-    const c1 = await patch(s1.adminJar, s1.order.id, { status: "CANCELLED", note: "Customer requested" });
+    const c1 = await patch(s1.adminJar, s1.order.id, {
+      status: "CANCELLED",
+      note: "Customer requested",
+    });
     expect(c1.status).toBe(200);
     let [v] = await db.select().from(productVariants).where(eq(productVariants.id, s1.variant.id));
     expect(v.stock).toBe(before1.stock); // restored to pre-deduction level
 
     // Case 2: not deducted → nothing to restore
     const s2 = await setupOrder("cashew-w320", "250g", 1);
-    const [before2] = await db.select().from(productVariants).where(eq(productVariants.id, s2.variant.id));
+    const [before2] = await db
+      .select()
+      .from(productVariants)
+      .where(eq(productVariants.id, s2.variant.id));
     const c2 = await patch(s2.adminJar, s2.order.id, { status: "CANCELLED" });
     expect(c2.status).toBe(200);
     [v] = await db.select().from(productVariants).where(eq(productVariants.id, s2.variant.id));
@@ -140,17 +163,29 @@ describe("admin orders list", () => {
     const b = await setupOrder();
     await patch(a.adminJar, a.order.id, { status: "PAYMENT_CONFIRMED" });
 
-    const pending = await call(adminOrdersHandler, { jar: a.adminJar, query: { status: "PENDING", limit: "50" } });
+    const pending = await call(adminOrdersHandler, {
+      jar: a.adminJar,
+      query: { status: "PENDING", limit: "50" },
+    });
     expect(pending.body.data.orders.every((o: any) => o.status === "PENDING")).toBe(true);
 
-    const byNumber = await call(adminOrdersHandler, { jar: a.adminJar, query: { q: a.order.orderNumber } });
+    const byNumber = await call(adminOrdersHandler, {
+      jar: a.adminJar,
+      query: { q: a.order.orderNumber },
+    });
     expect(byNumber.body.data.orders).toHaveLength(1);
     expect(byNumber.body.data.orders[0].id).toBe(a.order.id);
 
-    const byMobile = await call(adminOrdersHandler, { jar: a.adminJar, query: { q: "9876543210" } });
+    const byMobile = await call(adminOrdersHandler, {
+      jar: a.adminJar,
+      query: { q: "9876543210" },
+    });
     expect(byMobile.body.data.orders.length).toBeGreaterThanOrEqual(2);
 
-    const page = await call(adminOrdersHandler, { jar: a.adminJar, query: { page: "1", limit: "1" } });
+    const page = await call(adminOrdersHandler, {
+      jar: a.adminJar,
+      query: { page: "1", limit: "1" },
+    });
     expect(page.body.data.orders).toHaveLength(1);
     expect(page.body.data.total).toBeGreaterThanOrEqual(2);
   });

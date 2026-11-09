@@ -12,9 +12,9 @@ const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground shadow-soft hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-gold",
         gold: "bg-gold text-gold-foreground shadow-gold hover:-translate-y-0.5 hover:brightness-105",
-        cream:
-          "bg-cream text-primary-deep hover:-translate-y-0.5 hover:bg-card hover:shadow-gold",
-        whatsapp: "bg-whatsapp text-primary-foreground shadow-soft hover:-translate-y-0.5 hover:brightness-105",
+        cream: "bg-cream text-primary-deep hover:-translate-y-0.5 hover:bg-card hover:shadow-gold",
+        whatsapp:
+          "bg-whatsapp text-primary-foreground shadow-soft hover:-translate-y-0.5 hover:brightness-105",
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-primary text-primary bg-transparent hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground",

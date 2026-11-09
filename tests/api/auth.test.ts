@@ -65,7 +65,10 @@ describe("POST /api/auth/register", () => {
     // Admin already exists from seed → 409; so register a fresh admin-email case is impossible.
     // Instead verify the seeded admin logs in with role admin.
     expect(res.status).toBe(409);
-    const { res: loginRes } = await loginAs(process.env.ADMIN_EMAIL!, process.env.ADMIN_INITIAL_PASSWORD!);
+    const { res: loginRes } = await loginAs(
+      process.env.ADMIN_EMAIL!,
+      process.env.ADMIN_INITIAL_PASSWORD!,
+    );
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.data.user.role).toBe("admin");
   });
@@ -102,10 +105,18 @@ describe("POST /api/auth/login", () => {
     const { email } = await createCustomer();
     const headers = ip(12);
     for (let i = 0; i < 5; i++) {
-      const r = await call(loginHandler, { method: "POST", body: { email, password: "BadPass1" }, headers });
+      const r = await call(loginHandler, {
+        method: "POST",
+        body: { email, password: "BadPass1" },
+        headers,
+      });
       expect(r.status).toBe(401);
     }
-    const sixth = await call(loginHandler, { method: "POST", body: { email, password: "BadPass1" }, headers });
+    const sixth = await call(loginHandler, {
+      method: "POST",
+      body: { email, password: "BadPass1" },
+      headers,
+    });
     expect(sixth.status).toBe(429);
     expect(sixth.body.error.code).toBe("RATE_LIMITED");
   });

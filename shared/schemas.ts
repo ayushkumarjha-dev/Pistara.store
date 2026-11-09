@@ -1,11 +1,7 @@
 import { z } from "zod";
 
 // ---- primitives ----
-export const emailSchema = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .email("Enter a valid email address");
+export const emailSchema = z.string().trim().toLowerCase().email("Enter a valid email address");
 
 export const passwordSchema = z
   .string()
@@ -22,7 +18,10 @@ export const pincodeSchema = z.string().regex(/^\d{6}$/, "Enter a valid 6-digit 
 export const imageUrlSchema = z
   .string()
   .min(1, "Enter a valid URL")
-  .refine((u) => /^https?:\/\//i.test(u) || u.startsWith("/"), "Image URL must start with http://, https:// or /");
+  .refine(
+    (u) => /^https?:\/\//i.test(u) || u.startsWith("/"),
+    "Image URL must start with http://, https:// or /",
+  );
 
 // ---- auth ----
 export const registerSchema = z.object({

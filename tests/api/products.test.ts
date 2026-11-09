@@ -21,7 +21,9 @@ describe("GET /api/products", () => {
       expect(p.deletedAt).toBeNull();
       expect(p.images.length).toBeGreaterThan(0);
       expect(p.variants.length).toBe(3);
-      expect(p.fromPrice).toBe(Math.min(...p.variants.filter((v: any) => v.isActive).map((v: any) => v.price)));
+      expect(p.fromPrice).toBe(
+        Math.min(...p.variants.filter((v: any) => v.isActive).map((v: any) => v.price)),
+      );
     }
   });
 
@@ -37,7 +39,9 @@ describe("GET /api/products", () => {
   });
 
   it("filters by price range", async () => {
-    const res = await call(productsHandler, { query: { minPrice: "200", maxPrice: "300", limit: "50" } });
+    const res = await call(productsHandler, {
+      query: { minPrice: "200", maxPrice: "300", limit: "50" },
+    });
     for (const p of res.body.data.products) {
       expect(p.fromPrice).toBeGreaterThanOrEqual(200);
       expect(p.fromPrice).toBeLessThanOrEqual(300);
@@ -90,7 +94,11 @@ describe("GET /api/categories and /api/settings", () => {
   it("returns 3 seeded categories in order", async () => {
     const res = await call(categoriesHandler, {});
     expect(res.status).toBe(200);
-    expect(res.body.data.categories.map((c: any) => c.slug)).toEqual(["makhana", "cashew", "dried-grapes"]);
+    expect(res.body.data.categories.map((c: any) => c.slug)).toEqual([
+      "makhana",
+      "cashew",
+      "dried-grapes",
+    ]);
   });
 
   it("returns public settings only", async () => {

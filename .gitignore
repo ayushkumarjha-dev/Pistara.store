@@ -32,3 +32,12 @@ dist-ssr
 *.sw?
 pistara-test.db
 .env.test
+.env
+!.env.example
+!.env.test.example
+
+# Build / test artifacts
+.vercel/
+coverage/
+test-results/
+playwright-report/

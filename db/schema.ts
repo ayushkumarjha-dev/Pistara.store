@@ -1,7 +1,18 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  check,
+  index,
+  integer,
+  real,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
-const id = () => text("id").primaryKey().$defaultFn(() => crypto.randomUUID());
+const id = () =>
+  text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID());
 const ts = (name: string) => integer(name).notNull();
 
 export const users = sqliteTable(
@@ -11,7 +22,9 @@ export const users = sqliteTable(
     name: text("name").notNull(),
     email: text("email").notNull(),
     passwordHash: text("password_hash").notNull(),
-    role: text("role", { enum: ["customer", "admin"] }).notNull().default("customer"),
+    role: text("role", { enum: ["customer", "admin"] })
+      .notNull()
+      .default("customer"),
     mobile: text("mobile"),
     createdAt: ts("created_at"),
     updatedAt: ts("updated_at"),
@@ -23,7 +36,9 @@ export const addresses = sqliteTable(
   "addresses",
   {
     id: id(),
-    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     line1: text("line1").notNull(),
     line2: text("line2"),
     area: text("area"),
@@ -52,7 +67,9 @@ export const products = sqliteTable(
   "products",
   {
     id: id(),
-    categoryId: text("category_id").notNull().references(() => categories.id),
+    categoryId: text("category_id")
+      .notNull()
+      .references(() => categories.id),
     name: text("name").notNull(),
     nameHi: text("name_hi").notNull().default(""),
     slug: text("slug").notNull(),
@@ -67,14 +84,19 @@ export const products = sqliteTable(
     createdAt: ts("created_at"),
     updatedAt: ts("updated_at"),
   },
-  (t) => [uniqueIndex("products_slug_unique").on(t.slug), index("products_category_idx").on(t.categoryId)],
+  (t) => [
+    uniqueIndex("products_slug_unique").on(t.slug),
+    index("products_category_idx").on(t.categoryId),
+  ],
 );
 
 export const productImages = sqliteTable(
   "product_images",
   {
     id: id(),
-    productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
     url: text("url").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
     isPrimary: integer("is_primary", { mode: "boolean" }).notNull().default(false),
@@ -86,7 +108,9 @@ export const productVariants = sqliteTable(
   "product_variants",
   {
     id: id(),
-    productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
     label: text("label", { enum: ["250g", "500g", "1kg"] }).notNull(),
     weightGrams: integer("weight_grams").notNull(),
     price: integer("price").notNull(),
@@ -94,7 +118,10 @@ export const productVariants = sqliteTable(
     stock: integer("stock").notNull().default(0),
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   },
-  (t) => [index("product_variants_product_idx").on(t.productId), check("product_variants_stock_nonneg", sql`${t.stock} >= 0`)],
+  (t) => [
+    index("product_variants_product_idx").on(t.productId),
+    check("product_variants_stock_nonneg", sql`${t.stock} >= 0`),
+  ],
 );
 
 export const orders = sqliteTable(
@@ -102,10 +129,22 @@ export const orders = sqliteTable(
   {
     id: id(),
     orderNumber: text("order_number").notNull(),
-    userId: text("user_id").notNull().references(() => users.id),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
     status: text("status", {
-      enum: ["PENDING", "PAYMENT_CONFIRMED", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"],
-    }).notNull().default("PENDING"),
+      enum: [
+        "PENDING",
+        "PAYMENT_CONFIRMED",
+        "PACKED",
+        "SHIPPED",
+        "OUT_FOR_DELIVERY",
+        "DELIVERED",
+        "CANCELLED",
+      ],
+    })
+      .notNull()
+      .default("PENDING"),
     subtotal: integer("subtotal").notNull(),
     deliveryCharge: integer("delivery_charge").notNull(),
     total: integer("total").notNull(),
@@ -131,7 +170,9 @@ export const orderItems = sqliteTable(
   "order_items",
   {
     id: id(),
-    orderId: text("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+    orderId: text("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
     productId: text("product_id").notNull(),
     variantId: text("variant_id").notNull(),
     productName: text("product_name").notNull(),
@@ -148,7 +189,9 @@ export const orderStatusHistory = sqliteTable(
   "order_status_history",
   {
     id: id(),
-    orderId: text("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+    orderId: text("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
     status: text("status").notNull(),
     note: text("note"),
     actor: text("actor", { enum: ["customer", "admin", "system"] }).notNull(),

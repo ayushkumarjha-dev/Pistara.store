@@ -17,7 +17,11 @@ export function ProductCard({ product }: { product: UIProduct }) {
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
-      <Link to="/product/$slug" params={{ slug: product.slug }} className="relative block aspect-square overflow-hidden bg-olive-50">
+      <Link
+        to="/product/$slug"
+        params={{ slug: product.slug }}
+        className="relative block aspect-square overflow-hidden bg-olive-50"
+      >
         <img
           src={product.images[0]}
           alt={product.name}
@@ -50,7 +54,11 @@ export function ProductCard({ product }: { product: UIProduct }) {
         <span className="w-fit rounded-full bg-sage px-2.5 py-0.5 text-[0.7rem] font-medium text-primary-deep">
           {lang === "hi" ? product.categoryNameHi : product.categoryName}
         </span>
-        <Link to="/product/$slug" params={{ slug: product.slug }} className="font-display text-base font-semibold leading-snug text-foreground hover:text-primary">
+        <Link
+          to="/product/$slug"
+          params={{ slug: product.slug }}
+          className="font-display text-base font-semibold leading-snug text-foreground hover:text-primary"
+        >
           {name}
         </Link>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -61,7 +69,9 @@ export function ProductCard({ product }: { product: UIProduct }) {
         </div>
         <div className="mt-auto flex flex-wrap items-baseline gap-2 pt-2">
           <span className="text-xs text-muted-foreground">{t("from")}</span>
-          <span className="font-display text-lg font-bold text-primary-deep">{formatINR(product.fromPrice ?? base.price)}</span>
+          <span className="font-display text-lg font-bold text-primary-deep">
+            {formatINR(product.fromPrice ?? base.price)}
+          </span>
           <span className="text-sm text-muted-foreground line-through">{formatINR(base.mrp)}</span>
           <span className="rounded-full bg-success/15 px-2 py-0.5 text-[0.7rem] font-semibold text-success">
             {discountPct(base.price, base.mrp)}% off

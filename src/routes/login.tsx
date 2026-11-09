@@ -65,7 +65,9 @@ function LoginPage() {
           {mode === "login" ? "Welcome back" : "Create your account"}
         </h1>
         <p className="mt-1 text-center text-sm text-muted-foreground">
-          {mode === "login" ? "Sign in to track orders and check out faster." : "Join Pistara for faster WhatsApp checkout."}
+          {mode === "login"
+            ? "Sign in to track orders and check out faster."
+            : "Join Pistara for faster WhatsApp checkout."}
         </p>
 
         <div className="mt-6 grid grid-cols-2 rounded-full bg-sage p-1 text-sm font-semibold">
@@ -86,7 +88,9 @@ function LoginPage() {
         <form onSubmit={submit} className="mt-6 space-y-4">
           {mode === "register" && (
             <div>
-              <label htmlFor="name" className="text-sm font-medium">Full name</label>
+              <label htmlFor="name" className="text-sm font-medium">
+                Full name
+              </label>
               <input
                 id="name"
                 required
@@ -99,7 +103,9 @@ function LoginPage() {
             </div>
           )}
           <div>
-            <label htmlFor="email" className="text-sm font-medium">Email</label>
+            <label htmlFor="email" className="text-sm font-medium">
+              Email
+            </label>
             <input
               id="email"
               type="email"
@@ -111,7 +117,9 @@ function LoginPage() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="text-sm font-medium">Password</label>
+            <label htmlFor="password" className="text-sm font-medium">
+              Password
+            </label>
             <input
               id="password"
               type="password"
@@ -123,7 +131,11 @@ function LoginPage() {
               placeholder={mode === "register" ? "At least 8 characters" : "••••••••"}
             />
           </div>
-          {error && <p className="rounded-xl bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
+          {error && (
+            <p className="rounded-xl bg-destructive/10 px-4 py-2 text-sm text-destructive">
+              {error}
+            </p>
+          )}
           <Button type="submit" size="lg" className="w-full" disabled={busy}>
             {busy && <Loader2 className="animate-spin" />}
             {mode === "login" ? t("login") : "Create account"}

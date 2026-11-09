@@ -28,7 +28,10 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Shop Dry Fruits | Pistara" },
-      { name: "description", content: "Browse premium makhana, cashews and raisins in 250g, 500g and 1kg packs." },
+      {
+        name: "description",
+        content: "Browse premium makhana, cashews and raisins in 250g, 500g and 1kg packs.",
+      },
       { property: "og:title", content: "Shop Dry Fruits | Pistara" },
       { property: "og:description", content: "Browse premium makhana, cashews and raisins." },
     ],
@@ -53,9 +56,17 @@ function ShopPage() {
   const [qInput, setQInput] = useState(search.q ?? "");
 
   const setSearch = (patch: Partial<ShopSearch>) =>
-    navigate({ search: (old: ShopSearch) => ({ ...old, page: undefined, ...patch }), replace: true });
+    navigate({
+      search: (old: ShopSearch) => ({ ...old, page: undefined, ...patch }),
+      replace: true,
+    });
 
-  const catsQ = useQuery({ queryKey: ["categories"], queryFn: getCategories, staleTime: 5 * 60_000, retry: 1 });
+  const catsQ = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
   const productsQ = useQuery({
     queryKey: ["products", "shop", search],
     queryFn: () =>
@@ -105,7 +116,9 @@ function ShopPage() {
               onClick={() => setSearch({ sort: s.id === "featured" ? undefined : s.id })}
               className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                (search.sort ?? "featured") === s.id ? "bg-primary text-primary-foreground" : "hover:bg-sage",
+                (search.sort ?? "featured") === s.id
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-sage",
               )}
             >
               {s.label}
@@ -130,7 +143,9 @@ function ShopPage() {
           onClick={() => setSearch({ category: undefined })}
           className={cn(
             "rounded-full px-4 py-2 font-display text-sm font-semibold transition-colors",
-            !search.category ? "bg-primary-deep text-primary-foreground" : "bg-sage text-primary-deep hover:bg-sage/70",
+            !search.category
+              ? "bg-primary-deep text-primary-foreground"
+              : "bg-sage text-primary-deep hover:bg-sage/70",
           )}
         >
           All
@@ -141,7 +156,9 @@ function ShopPage() {
             onClick={() => setSearch({ category: c.slug })}
             className={cn(
               "rounded-full px-4 py-2 font-display text-sm font-semibold transition-colors",
-              search.category === c.slug ? "bg-primary-deep text-primary-foreground" : "bg-sage text-primary-deep hover:bg-sage/70",
+              search.category === c.slug
+                ? "bg-primary-deep text-primary-foreground"
+                : "bg-sage text-primary-deep hover:bg-sage/70",
             )}
           >
             {lang === "hi" ? c.nameHi : c.name}
@@ -158,14 +175,26 @@ function ShopPage() {
         </div>
       ) : productsQ.isError ? (
         <div className="mt-16 rounded-3xl border bg-card p-12 text-center">
-          <p className="font-display text-lg font-semibold text-primary-deep">The catalogue could not be loaded</p>
-          <p className="mt-2 text-sm text-muted-foreground">Please check your connection and try again.</p>
-          <Button className="mt-6" onClick={() => productsQ.refetch()}>Retry</Button>
+          <p className="font-display text-lg font-semibold text-primary-deep">
+            The catalogue could not be loaded
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Please check your connection and try again.
+          </p>
+          <Button className="mt-6" onClick={() => productsQ.refetch()}>
+            Retry
+          </Button>
         </div>
       ) : products.length === 0 ? (
         <div className="mt-16 rounded-3xl border bg-card p-12 text-center">
-          <p className="font-display text-lg font-semibold text-primary-deep">Nothing matches those filters</p>
-          <Button variant="outline" className="mt-6" onClick={() => navigate({ search: {}, replace: true })}>
+          <p className="font-display text-lg font-semibold text-primary-deep">
+            Nothing matches those filters
+          </p>
+          <Button
+            variant="outline"
+            className="mt-6"
+            onClick={() => navigate({ search: {}, replace: true })}
+          >
             Clear filters
           </Button>
         </div>
@@ -183,7 +212,9 @@ function ShopPage() {
           {Array.from({ length: pages }).map((_, i) => (
             <button
               key={i}
-              onClick={() => navigate({ search: (old: ShopSearch) => ({ ...old, page: i + 1 }), replace: true })}
+              onClick={() =>
+                navigate({ search: (old: ShopSearch) => ({ ...old, page: i + 1 }), replace: true })
+              }
               className={cn(
                 "grid size-10 place-items-center rounded-full border font-display text-sm font-semibold",
                 page === i + 1 ? "bg-primary text-primary-foreground" : "hover:bg-sage",

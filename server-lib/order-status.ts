@@ -43,7 +43,10 @@ export function validateTransition(
     return { code: "INVALID_TRANSITION", message: `Cannot move an order from ${from} to ${to}` };
   }
   if (to === "SHIPPED" && (!ctx.courierName || !ctx.trackingId)) {
-    return { code: "SHIPPING_INFO_REQUIRED", message: "Courier name and tracking ID are required to mark an order as shipped" };
+    return {
+      code: "SHIPPING_INFO_REQUIRED",
+      message: "Courier name and tracking ID are required to mark an order as shipped",
+    };
   }
   return null;
 }

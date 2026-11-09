@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  # Lets you re-run a production deploy from the Actions tab (e.g. right after
+  # adding the VERCEL_* repository secrets) without pushing a new commit.
+  workflow_dispatch:
+
+# Cancel superseded runs on branches/PRs, but never interrupt a main deploy.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  test:
+    name: Test (unit + API + E2E + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The suite refuses to touch any database whose URL does not contain
+      # "test" — a local file DB satisfies the guard and needs no secrets.
+      - name: Create test env
+        run: |
+          cat > .env.test <<'EOF'
+          TURSO_DATABASE_URL=file:./pistara-test.db
+          TURSO_AUTH_TOKEN=
+          JWT_SECRET=ci-test-secret-change-me-32-chars-minimum
+          APP_URL=http://localhost:8090
+          ADMIN_EMAIL=admin@test.pistara
+          ADMIN_INITIAL_PASSWORD=TestAdmin123
+          WHATSAPP_NUMBER=919999999999
+          EOF
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # test:ci = unit + API (with coverage gate at 80% lines on
+      # /api + /server-lib) + Playwright E2E. Playwright starts its own
+      # Vite dev server and a dedicated test-DB API server.
+      - name: Run tests
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  deploy:
+    name: Deploy (Vercel production)
+    needs: test
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Requires repository secrets: VERCEL_TOKEN, VERCEL_ORG_ID,
+      # VERCEL_PROJECT_ID. vercel.json sets git.deploymentEnabled=false so
+      # this workflow is the only thing that deploys production.
+      - name: Deploy to Vercel
+        run: |
+          npx vercel pull --yes --environment=production
+          npx vercel build
+          npx vercel deploy --prebuilt --prod
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

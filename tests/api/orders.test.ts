@@ -7,13 +7,22 @@ import ordersHandler from "../../api/orders/index";
 import orderDetailHandler from "../../api/orders/[id]";
 import cancelHandler from "../../api/orders/[id]/cancel";
 import { call, CookieJar } from "../helpers/request";
-import { createCustomer, completeProfile, customerWithProfile, getVariant, createOrder } from "../helpers/factories";
+import {
+  createCustomer,
+  completeProfile,
+  customerWithProfile,
+  getVariant,
+  createOrder,
+} from "../helpers/factories";
 import { getDb } from "../../db/client";
 import { orders as ordersTable, productVariants } from "../../db/schema";
 
 describe("POST /api/orders", () => {
   it("requires login", async () => {
-    const res = await call(ordersHandler, { method: "POST", body: { items: [{ variantId: "x", quantity: 1 }] } });
+    const res = await call(ordersHandler, {
+      method: "POST",
+      body: { items: [{ variantId: "x", quantity: 1 }] },
+    });
     expect(res.status).toBe(401);
   });
 
@@ -151,7 +160,10 @@ describe("POST /api/orders/[id]/cancel", () => {
     const orderId = res.body.data.order.id;
 
     const db = getDb();
-    const [before] = await db.select().from(productVariants).where(eq(productVariants.id, variant.id));
+    const [before] = await db
+      .select()
+      .from(productVariants)
+      .where(eq(productVariants.id, variant.id));
     const cancel = await call(cancelHandler, { method: "POST", jar, query: { id: orderId } });
     expect(cancel.status).toBe(200);
     expect(cancel.body.data.order.status).toBe("CANCELLED");
@@ -208,7 +220,11 @@ describe("POST /api/orders/[id]/cancel", () => {
     const b = await customerWithProfile();
     const { variant } = await getVariant("premium-makhana", "250g");
     const res = await createOrder(a.jar, [{ variantId: variant.id, quantity: 1 }]);
-    const r = await call(cancelHandler, { method: "POST", jar: b.jar, query: { id: res.body.data.order.id } });
+    const r = await call(cancelHandler, {
+      method: "POST",
+      jar: b.jar,
+      query: { id: res.body.data.order.id },
+    });
     expect(r.status).toBe(404);
   });
 });

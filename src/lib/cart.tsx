@@ -98,7 +98,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }),
       setQty: (variantId, qty) =>
         setLines((ls) =>
-          qty <= 0 ? ls.filter((l) => l.variantId !== variantId) : ls.map((l) => (l.variantId === variantId ? { ...l, qty } : l)),
+          qty <= 0
+            ? ls.filter((l) => l.variantId !== variantId)
+            : ls.map((l) => (l.variantId === variantId ? { ...l, qty } : l)),
         ),
       remove: (variantId) => setLines((ls) => ls.filter((l) => l.variantId !== variantId)),
       clear: () => setLines([]),

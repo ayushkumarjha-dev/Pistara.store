@@ -10,5 +10,11 @@ export const Route = createFileRoute("/contact")({
       { property: "og:description", content: "Reach Pistara on WhatsApp, phone or email." },
     ],
   }),
-  component: () => <ComingNext title="Get in" accent="Touch" text="The contact page arrives in the next step. Meanwhile, tap the WhatsApp button." />,
+  component: () => (
+    <ComingNext
+      title="Get in"
+      accent="Touch"
+      text="The contact page arrives in the next step. Meanwhile, tap the WhatsApp button."
+    />
+  ),
 });

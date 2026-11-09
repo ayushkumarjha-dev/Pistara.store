@@ -94,7 +94,9 @@ export async function getProducts(opts: ProductListOptions = {}) {
   params.set("limit", String(opts.limit ?? 50));
 
   const [{ products, total }, categories] = await Promise.all([
-    apiGet<{ products: ApiProduct[]; total: number; page: number; limit: number }>(`/api/products?${params}`),
+    apiGet<{ products: ApiProduct[]; total: number; page: number; limit: number }>(
+      `/api/products?${params}`,
+    ),
     getCategories(),
   ]);
   return { products: products.map((p) => toUIProduct(p, categories)), total };
@@ -102,10 +104,15 @@ export async function getProducts(opts: ProductListOptions = {}) {
 
 export async function getProduct(slug: string) {
   const [{ product, related }, categories] = await Promise.all([
-    apiGet<{ product: ApiProduct; related: ApiProduct[] }>(`/api/products/${encodeURIComponent(slug)}`),
+    apiGet<{ product: ApiProduct; related: ApiProduct[] }>(
+      `/api/products/${encodeURIComponent(slug)}`,
+    ),
     getCategories(),
   ]);
-  return { product: toUIProduct(product, categories), related: related.map((p) => toUIProduct(p, categories)) };
+  return {
+    product: toUIProduct(product, categories),
+    related: related.map((p) => toUIProduct(p, categories)),
+  };
 }
 
 export async function getSettings() {

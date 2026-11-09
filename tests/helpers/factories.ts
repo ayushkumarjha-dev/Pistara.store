@@ -11,7 +11,9 @@ import { CookieJar, call } from "./request";
 let seq = 0;
 const runId = crypto.randomUUID().slice(0, 8); // unique per test-file module instance
 
-export async function createCustomer(overrides: { name?: string; email?: string; password?: string } = {}) {
+export async function createCustomer(
+  overrides: { name?: string; email?: string; password?: string } = {},
+) {
   seq += 1;
   const email = overrides.email ?? `customer-${runId}-${seq}@test.pistara`;
   const password = overrides.password ?? "Password1";
@@ -72,7 +74,10 @@ export async function getVariant(productSlug: string, label: "250g" | "500g" | "
   return { product, variant };
 }
 
-export async function createOrder(jar: CookieJar, items: { variantId: string; quantity: number }[]) {
+export async function createOrder(
+  jar: CookieJar,
+  items: { variantId: string; quantity: number }[],
+) {
   const res = await call(ordersHandler, { method: "POST", jar, body: { items } });
   return res;
 }

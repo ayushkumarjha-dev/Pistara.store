@@ -1,5 +1,5 @@
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
-import { getDb } from "../db/client";
+import { desc, eq, inArray, sql } from "drizzle-orm";
+import { getDb } from "../../db/client";
 import {
   addresses,
   orderCounters,
@@ -11,80 +11,21 @@ import {
   productVariants,
   settings,
   users,
-} from "../db/schema";
-import { createOrderSchema, type OrderStatus } from "../shared/schemas";
-import { handler, HttpError } from "../server-lib/http";
-import { requireUser } from "../server-lib/auth";
-import { formatOrderNumber } from "../server-lib/order-number";
-import { buildWhatsAppUrl } from "../server-lib/whatsapp";
-import { customerCanCancel } from "../server-lib/order-status";
+} from "../../db/schema";
+import { createOrderSchema } from "../../shared/schemas";
+import { handler, HttpError } from "../../server-lib/http";
+import { requireUser } from "../../server-lib/auth";
+import { formatOrderNumber } from "../../server-lib/order-number";
+import { buildWhatsAppUrl } from "../../server-lib/whatsapp";
 
 export default handler({
   methods: ["GET", "POST"],
   body: createOrderSchema,
-  handler: async ({ req, body, query }) => {
+  handler: async ({ req, body }) => {
     const session = await requireUser(req);
     const db = getDb();
-    const id = query.id as string | undefined;
-    const action = (query.action as string) || "";
 
-    // GET /api/orders?id=xxx - Get single order
-    if (req.method === "GET" && id) {
-      const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-      if (!order || order.userId !== session.sub) throw new HttpError(404, "NOT_FOUND", "Order not found");
-
-      const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
-      const history = await db
-        .select()
-        .from(orderStatusHistory)
-        .where(eq(orderStatusHistory.orderId, order.id))
-        .orderBy(asc(orderStatusHistory.createdAt));
-
-      return { order, items, history };
-    }
-
-    // POST /api/orders?id=xxx&action=cancel - Cancel order
-    if (req.method === "POST" && id && action === "cancel") {
-      const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-      if (!order || order.userId !== session.sub) throw new HttpError(404, "NOT_FOUND", "Order not found");
-
-      if (!customerCanCancel(order.status as OrderStatus)) {
-        throw new HttpError(
-          409,
-          "CANNOT_CANCEL",
-          "This order can no longer be cancelled online. Please contact us on WhatsApp for help.",
-        );
-      }
-
-      await db.transaction(async (tx) => {
-        if (order.stockDeducted) {
-          const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, order.id));
-          for (const item of items) {
-            await tx
-              .update(productVariants)
-              .set({ stock: sql`${productVariants.stock} + ${item.quantity}` })
-              .where(eq(productVariants.id, item.variantId));
-          }
-        }
-        const now = Date.now();
-        await tx
-          .update(orders)
-          .set({ status: "CANCELLED", stockDeducted: false, updatedAt: now })
-          .where(eq(orders.id, order.id));
-        await tx.insert(orderStatusHistory).values({
-          orderId: order.id,
-          status: "CANCELLED",
-          note: "Cancelled by customer",
-          actor: "customer",
-          createdAt: now,
-        });
-      });
-
-      const [updated] = await db.select().from(orders).where(eq(orders.id, order.id)).limit(1);
-      return { order: updated };
-    }
-
-    // GET /api/orders - List orders
+    // GET /api/orders - List current user's orders (newest first)
     if (req.method === "GET") {
       const rows = await db
         .select()
@@ -102,21 +43,45 @@ export default handler({
 
     // POST /api/orders - Create order
     const [user] = await db.select().from(users).where(eq(users.id, session.sub)).limit(1);
-    const [address] = await db.select().from(addresses).where(eq(addresses.userId, session.sub)).limit(1);
+    const [address] = await db
+      .select()
+      .from(addresses)
+      .where(eq(addresses.userId, session.sub))
+      .limit(1);
     const isComplete = Boolean(
-      user?.name && user?.mobile && address?.line1 && address?.city && address?.state && address?.pincode,
+      user?.name &&
+      user?.mobile &&
+      address?.line1 &&
+      address?.city &&
+      address?.state &&
+      address?.pincode,
     );
     if (!user || !isComplete) {
-      throw new HttpError(422, "PROFILE_INCOMPLETE", "Please complete your profile and address before ordering");
+      throw new HttpError(
+        422,
+        "PROFILE_INCOMPLETE",
+        "Please complete your profile and address before ordering",
+      );
     }
 
-    const [deliveryRow] = await db.select().from(settings).where(eq(settings.key, "delivery_charge")).limit(1);
+    const [deliveryRow] = await db
+      .select()
+      .from(settings)
+      .where(eq(settings.key, "delivery_charge"))
+      .limit(1);
     const deliveryCharge = Number(deliveryRow?.value ?? 50);
-    const [waRow] = await db.select().from(settings).where(eq(settings.key, "whatsapp_number")).limit(1);
+    const [waRow] = await db
+      .select()
+      .from(settings)
+      .where(eq(settings.key, "whatsapp_number"))
+      .limit(1);
     const whatsappNumber = waRow?.value ?? "";
 
     const variantIds = body.items.map((i) => i.variantId);
-    const variants = await db.select().from(productVariants).where(inArray(productVariants.id, variantIds));
+    const variants = await db
+      .select()
+      .from(productVariants)
+      .where(inArray(productVariants.id, variantIds));
     const productIds = [...new Set(variants.map((v) => v.productId))];
     const prods = productIds.length
       ? await db.select().from(products).where(inArray(products.id, productIds))
@@ -135,10 +100,12 @@ export default handler({
         throw new HttpError(
           409,
           "INSUFFICIENT_STOCK",
-          `Not enough stock for ${product.name} (${variant.label}) — only ${variant.stock} left`,
+          `Not enough stock for ${product.name} (${variant.label}) - only ${variant.stock} left`,
         );
       }
-      const image = images.find((i) => i.productId === product.id && i.isPrimary) ?? images.find((i) => i.productId === product.id);
+      const image =
+        images.find((i) => i.productId === product.id && i.isPrimary) ??
+        images.find((i) => i.productId === product.id);
       return {
         product,
         variant,
@@ -151,7 +118,14 @@ export default handler({
 
     const subtotal = lines.reduce((s, l) => s + l.lineTotal, 0);
     const total = subtotal + deliveryCharge;
-    const addressText = [address!.line1, address!.line2, address!.area, address!.city, address!.state, address!.pincode]
+    const addressText = [
+      address!.line1,
+      address!.line2,
+      address!.area,
+      address!.city,
+      address!.state,
+      address!.pincode,
+    ]
       .filter(Boolean)
       .join(", ");
 
@@ -160,8 +134,15 @@ export default handler({
       await tx
         .insert(orderCounters)
         .values({ year, lastNumber: 1 })
-        .onConflictDoUpdate({ target: orderCounters.year, set: { lastNumber: sql`${orderCounters.lastNumber} + 1` } });
-      const [counter] = await tx.select().from(orderCounters).where(eq(orderCounters.year, year)).limit(1);
+        .onConflictDoUpdate({
+          target: orderCounters.year,
+          set: { lastNumber: sql`${orderCounters.lastNumber} + 1` },
+        });
+      const [counter] = await tx
+        .select()
+        .from(orderCounters)
+        .where(eq(orderCounters.year, year))
+        .limit(1);
       const orderNumber = formatOrderNumber(year, counter!.lastNumber);
 
       const now = Date.now();

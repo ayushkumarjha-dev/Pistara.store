@@ -1,6 +1,9 @@
 {
   "framework": "tanstack-start",
   "buildCommand": "npm run build",
+  "git": {
+    "deploymentEnabled": false
+  },
   "rewrites": [
     { "source": "/api/auth/login", "destination": "/api/auth?action=login" },
     { "source": "/api/auth/register", "destination": "/api/auth?action=register" },

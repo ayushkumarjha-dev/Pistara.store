@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { canTransition, customerCanCancel, validateTransition } from "../../server-lib/order-status";
+import {
+  canTransition,
+  customerCanCancel,
+  validateTransition,
+} from "../../server-lib/order-status";
 import { PIPELINE } from "../../server-lib/order-status";
 import type { OrderStatus } from "../../shared/schemas";
 
@@ -26,7 +30,13 @@ describe("order status state machine", () => {
   });
 
   it("allows cancel from any non-final status", () => {
-    for (const s of ["PENDING", "PAYMENT_CONFIRMED", "PACKED", "SHIPPED", "OUT_FOR_DELIVERY"] as OrderStatus[]) {
+    for (const s of [
+      "PENDING",
+      "PAYMENT_CONFIRMED",
+      "PACKED",
+      "SHIPPED",
+      "OUT_FOR_DELIVERY",
+    ] as OrderStatus[]) {
       expect(canTransition(s, "CANCELLED")).toBe(true);
     }
   });
@@ -40,8 +50,12 @@ describe("order status state machine", () => {
 
   it("SHIPPED requires courier name and tracking id", () => {
     expect(validateTransition("PACKED", "SHIPPED")?.code).toBe("SHIPPING_INFO_REQUIRED");
-    expect(validateTransition("PACKED", "SHIPPED", { courierName: "Delhivery" })?.code).toBe("SHIPPING_INFO_REQUIRED");
-    expect(validateTransition("PACKED", "SHIPPED", { courierName: "Delhivery", trackingId: "TRK123" })).toBeNull();
+    expect(validateTransition("PACKED", "SHIPPED", { courierName: "Delhivery" })?.code).toBe(
+      "SHIPPING_INFO_REQUIRED",
+    );
+    expect(
+      validateTransition("PACKED", "SHIPPED", { courierName: "Delhivery", trackingId: "TRK123" }),
+    ).toBeNull();
   });
 
   it("validateTransition reports final and invalid moves", () => {

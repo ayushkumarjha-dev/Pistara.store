@@ -5,6 +5,6 @@
 - [x] Phase 3: Products, categories, settings, profile APIs + tests (frontend wiring in Phase 6)
 - [x] Phase 4: Orders (create/list/detail/cancel, stock rules) + tests (checkout wiring in Phase 6)
 - [x] Phase 5: Admin APIs (stats/products/orders/customers/settings) + tests (admin UI in Phase 6) — 94 tests green
-- [ ] Phase 6: Missing frontend pages (shop, product, cart, login, profile, orders, admin) + Playwright E2E
-- [ ] Phase 7: CI workflow (GitHub Actions + gated Vercel deploy), hardening, README
+- [x] Phase 6: Missing frontend pages (shop, product, cart, login, profile, orders, admin) + Playwright E2E (11 scenarios green)
+- [x] Phase 7: CI workflow (GitHub Actions + gated Vercel deploy), hardening, README
 - [ ] Blocked on user: Turso credentials (prod + test DB URLs/tokens), Vercel org/project IDs, GitHub secrets

@@ -25,12 +25,16 @@ function NotFoundComponent() {
   return (
     <div className="grain flex min-h-[70vh] items-center justify-center px-4">
       <div className="max-w-md text-center">
-        <div className="flex justify-center"><Logo /></div>
+        <div className="flex justify-center">
+          <Logo />
+        </div>
         <h1 className="mt-10 font-display text-8xl font-extrabold text-primary">404</h1>
         <h2 className="mt-4 text-2xl font-bold text-primary-deep">
           This shelf is <span className="accent-serif text-primary">empty</span>
         </h2>
-        <p className="mt-3 text-sm text-muted-foreground">The page you're looking for doesn't exist or has moved.</p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          The page you're looking for doesn't exist or has moved.
+        </p>
         <Button asChild className="mt-8">
           <Link to="/shop">Back to shop</Link>
         </Button>
@@ -49,8 +53,12 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">This page didn't load</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Something went wrong on our end. You can try refreshing or head back home.</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          This page didn't load
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Something went wrong on our end. You can try refreshing or head back home.
+        </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Button
             onClick={() => {
@@ -75,7 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Pistara | Premium Dry Fruits" },
-      { name: "description", content: "Premium makhana, cashews and raisins, hand-selected and hygienically packed." },
+      {
+        name: "description",
+        content: "Premium makhana, cashews and raisins, hand-selected and hygienically packed.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

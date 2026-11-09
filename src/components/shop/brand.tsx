@@ -7,7 +7,12 @@ import { cn } from "@/lib/utils";
 export function Logo({ light = false, className }: { light?: boolean; className?: string }) {
   return (
     <Link to="/" className={cn("flex items-center gap-2", className)} aria-label="Pistara home">
-      <span className={cn("grid size-10 place-items-center rounded-full", light ? "bg-cream" : "bg-olive-50")}>
+      <span
+        className={cn(
+          "grid size-10 place-items-center rounded-full",
+          light ? "bg-cream" : "bg-olive-50",
+        )}
+      >
         <img src={logoMark} alt="" width={64} height={64} className="size-8 object-contain" />
       </span>
       <span
@@ -38,14 +43,21 @@ export function Stars({ value, size = "sm" }: { value: number; size?: "sm" | "md
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
-          className={cn(size === "sm" ? "size-3.5" : "size-4.5", i <= Math.round(value) ? "fill-gold text-gold" : "text-border")}
+          className={cn(
+            size === "sm" ? "size-3.5" : "size-4.5",
+            i <= Math.round(value) ? "fill-gold text-gold" : "text-border",
+          )}
         />
       ))}
     </span>
   );
 }
 
-export function Reveal({ delay = 0, className, ...rest }: HTMLMotionProps<"div"> & { delay?: number }) {
+export function Reveal({
+  delay = 0,
+  className,
+  ...rest
+}: HTMLMotionProps<"div"> & { delay?: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 28 }}
@@ -59,12 +71,27 @@ export function Reveal({ delay = 0, className, ...rest }: HTMLMotionProps<"div">
 }
 
 export function SectionTitle({
-  eyebrow, a, b, align = "center", light = false,
-}: { eyebrow: string; a: string; b: string; align?: "center" | "left"; light?: boolean }) {
+  eyebrow,
+  a,
+  b,
+  align = "center",
+  light = false,
+}: {
+  eyebrow: string;
+  a: string;
+  b: string;
+  align?: "center" | "left";
+  light?: boolean;
+}) {
   return (
     <Reveal className={cn("max-w-2xl", align === "center" ? "mx-auto text-center" : "")}>
       <p className="eyebrow">{eyebrow}</p>
-      <h2 className={cn("mt-3 text-3xl font-bold md:text-5xl", light ? "text-primary-foreground" : "text-primary-deep")}>
+      <h2
+        className={cn(
+          "mt-3 text-3xl font-bold md:text-5xl",
+          light ? "text-primary-foreground" : "text-primary-deep",
+        )}
+      >
         {a} <span className={cn("accent-serif", light ? "text-gold" : "text-primary")}>{b}</span>
       </h2>
       <LeafDivider className={cn("mt-5", align === "left" && "justify-start")} light={light} />
